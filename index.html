@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOMPASS 2026 - MA Unggulan Darul 'Ulum Jombang</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        primary: '#0f5132',   /* Hijau khas Darul 'Ulum */
+                        secondary: '#b8860b', /* Emas / Gold */
+                        accent: '#198754',    /* Hijau Daun */
+                        dark: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .app-view { display: none; }
+        .app-view.active { display: block; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- NAVBAR (Auto-Resize & Responsive) -->
+    <nav class="bg-primary text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo & Brand (Menggunakan file lokal logo-mau.png & logo-kompass.png) -->
+                <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('home')">
+                    <img src="logo-mau.png" alt="Logo MAU" class="h-10 sm:h-12 w-auto object-contain">
+                    <img src="logo-kompass.png" alt="Logo KOMPASS" class="h-10 sm:h-12 w-auto object-contain">
+                    <div class="hidden sm:block leading-none ml-1">
+                        <span class="font-bold text-sm sm:text-base md:text-lg block tracking-wide text-white">KOMPASS 2026</span>
+                        <span class="text-[10px] sm:text-xs text-emerald-300 block">MA Unggulan Darul 'Ulum</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4 lg:space-x-6">
+                    <button onclick="navigateTo('home')" class="hover:text-secondary font-medium transition duration-300">Profil</button>
+                    <button onclick="navigateTo('news')" class="hover:text-secondary font-medium transition duration-300">Berita</button>
+                    <!-- Status Cloud Sync Indicator -->
+                    <span id="sync-indicator" class="flex items-center gap-1.5 text-xs bg-emerald-800 px-3 py-1.5 rounded-full border border-emerald-700">
+                        <span id="sync-dot" class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+                        <span id="sync-text">Supabase Aktif</span>
+                    </span>
+                    <!-- Auth State Button -->
+                    <div id="auth-nav-wrapper">
+                        <button onclick="openLoginModal()" class="bg-secondary text-white px-5 py-2 rounded-full font-semibold hover:bg-yellow-700 transition duration-300 shadow">
+                            <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-white hover:text-secondary focus:outline-none p-2 rounded">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary border-t border-emerald-800 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="navigateTo('home')" class="block w-full text-left py-2 text-white hover:text-secondary">Profil</button>
+            <button onclick="navigateTo('news')" class="block w-full text-left py-2 text-white hover:text-secondary">Berita</button>
+            <div id="auth-nav-mobile" class="pt-2"></div>
+        </div>
+    </nav>
+
+    <!-- VIEW: HOME (HALAMAN UTAMA) -->
+    <div id="view-home" class="app-view active flex-grow">
+        <!-- Hero Section (Responsive paddings & text) -->
+        <header class="relative bg-gradient-to-br from-primary via-emerald-950 to-slate-900 text-white py-16 sm:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
+            <div class="max-w-4xl mx-auto relative z-10">
+                <span class="inline-block bg-emerald-800 text-secondary font-semibold text-xs sm:text-sm px-4 py-1.5 rounded-full mb-6 border border-yellow-600/30">
+                    Pendaftaran Kompetisi Se-Jawa & Bali 2026
+                </span>
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 tracking-tight">KOMPASS 2026</h1>
+                <p class="text-xl sm:text-3xl font-semibold text-secondary mb-6">Kompetisi Agama, Sains, dan Seni</p>
+                <p class="text-gray-300 text-sm sm:text-base md:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Ajang pembuktian bakat dan kecerdasan siswa tingkat SMP/MTs sederajat dalam menyongsong tantangan zaman berbekal iman, sains, dan kreativitas.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-xs sm:max-w-none mx-auto">
+                    <button onclick="navigateTo('register')" class="bg-secondary text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-yellow-700 transition duration-300 transform hover:scale-105 w-full sm:w-auto">
+                        <i class="fa-solid fa-user-plus mr-2"></i> Daftar Sekarang
+                    </button>
+                    <a href="#lomba" class="border-2 border-white/80 hover:bg-white hover:text-primary text-white px-8 py-4 rounded-xl font-bold transition duration-300 w-full sm:w-auto flex items-center justify-center">
+                        <i class="fa-solid fa-list mr-2"></i> Cabang Lomba
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <section class="py-12 bg-white border-b border-gray-100">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+                    <div class="p-6 bg-slate-50 rounded-2xl shadow-sm">
+                        <i class="fa-solid fa-trophy text-4xl text-secondary mb-3"></i>
+                        <span id="stat-prizes" class="block text-2xl sm:text-3xl font-bold text-primary">Rp 15.000.000</span>
+                        <span class="text-gray-500 text-xs sm:text-sm font-medium">Total Hadiah & Beasiswa</span>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-2xl shadow-sm">
+                        <i class="fa-solid fa-cubes text-4xl text-secondary mb-3"></i>
+                        <span id="stat-branches" class="block text-2xl sm:text-3xl font-bold text-primary">4</span>
+                        <span class="text-gray-500 text-xs sm:text-sm font-medium">Cabang Perlombaan</span>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-2xl shadow-sm sm:col-span-2 md:col-span-1">
+                        <i class="fa-solid fa-user-graduate text-4xl text-secondary mb-3"></i>
+                        <span id="stat-registrants" class="block text-2xl sm:text-3xl font-bold text-primary">0</span>
+                        <span class="text-gray-500 text-xs sm:text-sm font-medium">Pendaftar Terverifikasi</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tentang Section -->
+        <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-4">Mengenal KOMPASS</h2>
+                    <div class="w-16 h-1.5 bg-secondary mb-6 rounded"></div>
+                    <p class="text-gray-600 leading-relaxed mb-6 text-justify text-sm sm:text-base">
+                        KOMPASS (Kompetisi Agama, Sains, dan Seni) yang digelar oleh <strong>MA Unggulan Darul 'Ulum STEP-2 Kemenag RI-IDB</strong> merupakan kompetisi akbar tahunan bagi pelajar berprestasi se-Jawa dan Bali. Kompetisi ini dirancang harmonis untuk mendorong siswa meraih integritas spiritual, ketajaman sains, serta kecintaan terhadap estetika seni Islam.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed text-justify text-sm sm:text-base">
+                        Setiap pemenang berhak mendapatkan piala penghargaan tetap, piagam resmi, dana pembinaan jutaan rupiah, serta peluang emas berupa jalur beasiswa khusus masuk ke MA Unggulan Darul 'Ulum Jombang.
+                    </p>
+                </div>
+                <div class="bg-gradient-to-tr from-emerald-800 to-primary text-white p-6 sm:p-8 rounded-2xl shadow-xl flex flex-col justify-center text-center order-1 md:order-2">
+                    <i class="fa-solid fa-medal text-yellow-400 text-6xl sm:text-7xl mb-4 animate-bounce"></i>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-2">Piala Bergilir & Penghargaan</h3>
+                    <p class="text-xs sm:text-sm text-emerald-200">Rebut tempat terbaik dan jadilah saksi lahirnya generasi unggul berikutnya di MA Unggulan Darul 'Ulum!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cabang Lomba Section -->
+        <section id="lomba" class="py-16 sm:py-20 bg-slate-100 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12 sm:mb-16">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-2">Cabang Perlombaan</h2>
+                    <p class="text-sm sm:text-base text-gray-500">Kategori lomba yang dibuka pada perhelatan KOMPASS tahun ini:</p>
+                </div>
+                <div id="categories-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- VIEW: REGISTER (HALAMAN PENDAFTARAN) -->
+    <div id="view-register" class="app-view flex-grow py-8 sm:py-16 px-4 sm:px-6 lg:px-8 bg-slate-50">
+        <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+            <div class="bg-primary text-white p-6 sm:p-8 text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold">Formulir Pendaftaran KOMPASS 2026</h2>
+                <p class="text-emerald-200 text-xs sm:text-sm mt-2">Isi data calon peserta lomba dengan lengkap dan teliti.</p>
+            </div>
+
+            <div class="flex items-center justify-center gap-2 sm:gap-4 bg-slate-100 py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-center">
+                <span id="step-badge-1" class="px-3 py-1.5 rounded-full bg-primary text-white">1. Data Peserta</span>
+                <span class="text-slate-400">&gt;</span>
+                <span id="step-badge-2" class="px-3 py-1.5 rounded-full bg-slate-200 text-slate-500">2. Pembayaran & Bukti</span>
+            </div>
+
+            <form id="pendaftaran-form" class="p-6 sm:p-8 space-y-6">
+                <!-- STEP 1: DATA PESERTA -->
+                <div id="form-step-1" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Nama Lengkap Peserta *</label>
+                            <input type="text" id="reg-nama" required placeholder="Nama lengkap sesuai kartu pelajar" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">NISN *</label>
+                            <input type="text" id="reg-nisn" required placeholder="Masukkan 10 digit NISN" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary outline-none text-sm">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Asal Sekolah (SMP/MTs) *</label>
+                            <input type="text" id="reg-sekolah" required placeholder="Contoh: MTsN 2 Jombang" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Kelas Saat Ini *</label>
+                            <select id="reg-kelas" required class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-primary outline-none text-sm">
+                                <option value="" disabled selected>Pilih kelas</option>
+                                <option value="7">Kelas 7</option>
+                                <option value="8">Kelas 8</option>
+                                <option value="9">Kelas 9</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Nomor WhatsApp Aktif *</label>
+                            <input type="tel" id="reg-wa" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-primary outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Cabang Lomba Pilihan *</label>
+                            <select id="reg-lomba" required class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-primary outline-none text-sm">
+                                <option value="" disabled selected>Pilih cabang lomba</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" onclick="goToStep(2)" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-900 transition duration-300 text-sm w-full sm:w-auto">
+                            Lanjut ke Pembayaran <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: PEMBAYARAN -->
+                <div id="form-step-2" class="space-y-6 hidden">
+                    <div class="bg-emerald-50 border-l-4 border-emerald-600 p-4 sm:p-5 rounded-r-xl">
+                        <h4 class="font-bold text-primary mb-1 text-sm sm:text-base">Informasi Rekening Pembayaran</h4>
+                        <p class="text-xs sm:text-sm text-emerald-800">Silakan lakukan transfer biaya pendaftaran sebesar <strong>Rp 50.000,-</strong> ke rekening berikut:</p>
+                        <ul class="text-[11px] sm:text-xs text-emerald-900 mt-2 space-y-1.5 list-disc pl-5">
+                            <li>Bank Syariah Indonesia (BSI) - <strong>7123456789</strong> a.n. KOMPASS MAUDU</li>
+                            <li>Bank Jatim - <strong>012345678</strong> a.n. MA Unggulan Darul 'Ulum</li>
+                        </ul>
+                    </div>
+
+                    <!-- Bukti Pembayaran -->
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Unggah Bukti Pembayaran *</label>
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary transition cursor-pointer relative" id="drop-zone">
+                            <input type="file" id="reg-bukti" accept="image/*,application/pdf" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <i id="upload-icon" class="fa-solid fa-cloud-arrow-up text-4xl text-slate-400 mb-2"></i>
+                            <p id="upload-text" class="text-xs sm:text-sm text-slate-600 font-medium">Seret file bukti bayar atau klik di sini untuk mengunggah</p>
+                            <p class="text-[10px] sm:text-xs text-slate-400 mt-1">Hanya format JPG, PNG, atau PDF (Maks. 2MB)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
+                        <button type="button" onclick="goToStep(1)" class="border border-slate-300 text-slate-600 px-6 py-3 rounded-xl font-bold hover:bg-slate-100 transition duration-300 text-sm w-full sm:w-auto">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                        </button>
+                        <button type="submit" class="bg-secondary text-white px-8 py-3 rounded-xl font-bold hover:bg-yellow-700 transition duration-300 shadow-md text-sm w-full sm:w-auto">
+                            Kirim & Selesaikan Pendaftaran
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="registration-success" class="hidden p-6 sm:p-8 text-center space-y-4">
+                <i class="fa-solid fa-circle-check text-6xl text-emerald-600 animate-bounce"></i>
+                <h3 class="text-2xl font-bold text-primary">Pendaftaran Terkirim!</h3>
+                <p class="text-slate-600 max-w-md mx-auto text-xs sm:text-sm">
+                    Terima kasih telah mendaftar di KOMPASS 2026. Data pendaftaran Anda berhasil disimpan ke cloud database. Status pendaftaran Anda saat ini adalah <strong class="text-amber-600">Pending</strong> menunggu konfirmasi admin.
+                </p>
+                <div class="pt-4">
+                    <button onclick="navigateTo('home')" class="bg-primary text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-emerald-900 transition text-sm">Kembali ke Beranda</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW: NEWS (HALAMAN BERITA) -->
+    <div id="view-news" class="app-view flex-grow py-8 sm:py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-2">Warta KOMPASS & Madrasah</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Ikuti perkembangan, jadwal teranyar, serta informasi penting lainnya.</p>
+                </div>
+                <div id="btn-create-news-wrapper" class="w-full sm:w-auto text-right"></div>
+            </div>
+
+            <!-- News Publisher Form -->
+            <div id="news-publisher-box" class="hidden bg-white border border-slate-200 p-6 rounded-2xl shadow-sm mb-12 max-w-2xl">
+                <h3 class="font-bold text-lg mb-4 text-primary">Tulis Berita Baru</h3>
+                <form id="news-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-1 text-slate-700">Judul Berita *</label>
+                        <input type="text" id="news-title" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-1 text-slate-700">Isi Berita *</label>
+                        <textarea id="news-content" rows="4" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" onclick="toggleNewsForm()" class="px-4 py-2 border rounded-lg hover:bg-slate-100 text-xs sm:text-sm">Batal</button>
+                        <button type="submit" class="px-6 py-2 bg-primary text-white font-bold rounded-lg hover:bg-emerald-900 text-xs sm:text-sm">Terbitkan Berita</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW: ADMIN DASHBOARD (PORTAL ADMIN/SUPER ADMIN/USER) -->
+    <div id="view-dashboard" class="app-view flex-grow bg-slate-100 py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+            <!-- Header Dashboard -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Dashboard Manajemen</h2>
+                    <p class="text-xs text-slate-500 mt-1">Selamat datang, <span id="dash-user-name" class="font-bold text-primary">Nama Akun</span> (<span id="dash-user-role" class="italic">Role</span>)</p>
+                </div>
+                <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 sm:py-2.5 rounded-xl font-bold transition duration-300 text-xs sm:text-sm w-full sm:w-auto">
+                    <i class="fa-solid fa-power-off mr-1.5"></i> Logout
+                </button>
+            </div>
+
+            <!-- Tab Navigation (Scrollable on small screens) -->
+            <div class="flex space-x-1 sm:space-x-2 border-b border-slate-200 overflow-x-auto pb-px">
+                <button onclick="switchDashTab('registrants')" id="tab-btn-registrants" class="whitespace-nowrap px-4 py-2.5 sm:px-5 sm:py-3 font-semibold rounded-t-xl bg-white border-t border-x border-slate-200 text-primary text-xs sm:text-sm">Data Pendaftar</button>
+                <button onclick="switchDashTab('settings')" id="tab-btn-settings" class="whitespace-nowrap px-4 py-2.5 sm:px-5 sm:py-3 font-semibold rounded-t-xl hover:bg-white text-slate-600 text-xs sm:text-sm">Pengaturan Lomba</button>
+                <button onclick="switchDashTab('usermgt')" id="tab-btn-usermgt" class="whitespace-nowrap px-4 py-2.5 sm:px-5 sm:py-3 font-semibold rounded-t-xl hover:bg-white text-slate-600 text-xs sm:text-sm">Manajemen Akun</button>
+            </div>
+
+            <!-- TAB CONTENT: DATA PENDAFTAR -->
+            <div id="tab-registrants" class="dash-tab bg-white rounded-2xl shadow-sm p-4 sm:p-6 overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h3 class="font-bold text-base sm:text-lg text-slate-800">Daftar Berkas Calon Peserta</h3>
+                    <select id="filter-status" onchange="renderDashboardRegistrants()" class="w-full sm:w-auto px-4 py-2 border rounded-xl bg-slate-50 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-primary">
+                        <option value="Semua">Semua Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Disetujui">Disetujui</option>
+                        <option value="Ditolak">Ditolak</option>
+                    </select>
+                </div>
+
+                <!-- Responsive Table Wrapper -->
+                <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-xs sm:text-sm font-semibold">
+                                <th class="p-3 sm:p-4">No.</th>
+                                <th class="p-3 sm:p-4">Nama</th>
+                                <th class="p-3 sm:p-4">Asal Sekolah</th>
+                                <th class="p-3 sm:p-4">Lomba</th>
+                                <th class="p-3 sm:p-4">Status</th>
+                                <th class="p-3 sm:p-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-registrants-tbody" class="divide-y divide-slate-100 text-xs sm:text-sm text-slate-600">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB CONTENT: PENGATURAN LOMBA -->
+            <div id="tab-settings" class="dash-tab hidden bg-white rounded-2xl shadow-sm p-4 sm:p-6 max-w-2xl">
+                <h3 class="font-bold text-base sm:text-lg text-slate-800 mb-6">Manajemen Event & Kategori Lomba</h3>
+                <form id="settings-form" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Total Hadiah (Teks Publik)</label>
+                            <input type="text" id="set-prizepool" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary outline-none text-xs sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Jumlah Cabang Lomba</label>
+                            <input type="number" id="set-branches-count" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary outline-none text-xs sm:text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-700 text-xs sm:text-sm mb-3">Cabang / Kategori Lomba</h4>
+                        <div id="set-categories-list" class="space-y-3">
+                            <!-- Dynamic inputs loaded here -->
+                        </div>
+                        <button type="button" onclick="addNewCategoryRow()" class="mt-3 text-xs sm:text-sm text-primary font-bold hover:underline">
+                            <i class="fa-solid fa-plus-circle mr-1"></i> Tambah Cabang Lomba Baru
+                        </button>
+                    </div>
+                    <div class="pt-4 border-t border-slate-100">
+                        <button type="submit" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-emerald-900 transition text-xs sm:text-sm">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TAB CONTENT: MANAJEMEN AKUN -->
+            <div id="tab-usermgt" class="dash-tab hidden bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Form Tambah / Edit User (Responsive & Dynamic Dual-Mode) -->
+                    <div id="usermgt-form-wrapper" class="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100 h-fit">
+                        <h4 id="user-form-title" class="font-bold text-slate-800 mb-4 text-sm sm:text-base">Tambah Pengguna Baru</h4>
+                        <form id="user-mgt-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                                <input type="text" id="user-new-username" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none text-xs sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                                <input type="password" id="user-new-password" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none text-xs sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Panggilan/Lengkap</label>
+                                <input type="text" id="user-new-fullname" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none text-xs sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Otoritas (Role)</label>
+                                <select id="user-new-role" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none text-xs sm:text-sm">
+                                    <option value="User">User</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Super Admin">Super Admin</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" id="btn-cancel-edit-user" onclick="cancelEditUserMode()" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-lg transition text-xs sm:text-sm hidden">
+                                    Batal
+                                </button>
+                                <button type="submit" id="btn-submit-user" class="w-full bg-primary hover:bg-emerald-900 text-white font-bold py-2.5 rounded-lg transition text-xs sm:text-sm shadow">
+                                    Tambah Akun
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tabel Akun -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm sm:text-base">Daftar Pengguna Sistem</h4>
+                        <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                            <table class="w-full text-left text-xs sm:text-sm text-slate-600 min-w-[450px]">
+                                <thead class="bg-slate-50 font-semibold text-slate-500 border-b border-slate-100">
+                                    <tr>
+                                        <th class="p-3">Username</th>
+                                        <th class="p-3">Nama</th>
+                                        <th class="p-3">Otoritas</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-list-tbody" class="divide-y divide-slate-100">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LOGIN (Responsive width scaling) -->
+    <div id="modal-login" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden border border-slate-200 mx-auto">
+            <div class="bg-primary p-6 text-white text-center relative">
+                <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-white/80 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <i class="fa-solid fa-lock text-3xl text-secondary mb-2"></i>
+                <h3 class="font-bold text-lg">Login Portal KOMPASS</h3>
+                <p class="text-xs text-emerald-200 mt-1">Masukkan kredensial otorisasi sistem Anda</p>
+            </div>
+            <form id="login-form" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                    <input type="text" id="login-username" required placeholder="Contoh: admin" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="login-password" required placeholder="Contoh: adminkompass" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
+                </div>
+                <div id="login-error" class="hidden text-xs text-rose-600 font-semibold bg-rose-50 p-2.5 rounded-lg text-center">
+                    Username atau Password salah!
+                </div>
+                <button type="submit" class="w-full bg-secondary text-white font-bold py-2.5 rounded-lg hover:bg-yellow-700 transition shadow text-sm">
+                    Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: DETAIL PENDAFTAR (Responsive scroll limit) -->
+    <div id="modal-detail" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col mx-auto">
+            <div class="bg-primary p-6 text-white flex justify-between items-center">
+                <h3 class="font-bold text-base sm:text-lg">Detail Berkas Pendaftar</h3>
+                <button onclick="closeDetailModal()" class="text-white/80 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-grow" id="detail-modal-body">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <!-- Madrasah Info -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">MA Unggulan Darul 'Ulum</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                        Pondok Pesantren Darul 'Ulum Rejoso, Peterongan, Jombang. Terakreditasi A. Bertekad melestarikan khazanah salaf sekaligus aktif bersinergi bersama perkembangan sains modern.
+                    </p>
+                    <span class="text-xs bg-emerald-950 text-emerald-300 px-3 py-1 rounded-full font-medium">Slogan: MAU ISO ISO ISO!</span>
+                </div>
+
+                <!-- Kontak Panitia -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Hubungi Kami</h4>
+                    <ul class="space-y-3 text-slate-400 text-sm">
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-location-dot text-secondary mt-1"></i>
+                            <span>Jl. Rejoso, Peterongan, Jombang, Jawa Timur - 61481</span>
+                        </li>
+                        <li class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-phone text-secondary"></i>
+                            <span>(0321) 8689911</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Google Maps Lokasi (Responsive redirection URL) -->
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Lokasi Madrasah</h4>
+                    <div class="w-full h-32 rounded-lg overflow-hidden relative shadow-md">
+                        <div class="absolute inset-0 bg-slate-800 flex flex-col justify-center items-center text-center p-3">
+                            <i class="fa-solid fa-map-location-dot text-secondary text-2xl mb-2"></i>
+                            <p class="text-xs text-slate-300 mb-2">MA Unggulan Darul 'Ulum STEP-2</p>
+                            <!-- Redirection URL provided -->
+                            <a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiEzrbE-K6VAxXNzjgGHcg0C5YQ_BJ6BAgXEAw&url=%2Fmaps%2Fplace%2FMA%2BUnggulan%2BDarul%2BUlum%2BSTEP-2%2BKemenag%2BRI%2B-%2BIDB%2Fdata%3D!4m2!3m1!1s0x0%3A0x6599084c194384f1%3Fsa%3DX%26ved%3D1t%3A2428%26ictx%3D111&usg=AOvVaw0h-x53guMFD36_vbNrA9Os&opi=89978449" 
+                               target="_blank" 
+                               class="bg-primary text-white font-semibold text-xs px-3 py-1.5 rounded-md hover:bg-emerald-950 transition">
+                                Lihat di Google Maps
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-slate-800 pt-8 text-center text-sm text-gray-500">
+                <p>&copy; 2026 MA Unggulan Darul 'Ulum STEP-2 Kemenag RI-IDB Jombang. Hak Cipta Dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT SYSTEM ENGINE WITH SUPABASE INTEGRATION -->
+    <script>
+        // SUPABASE CLIENT INITIALIZATION
+        const { createClient } = supabase;
+        const SUPABASE_URL = "https://tvkatuuwtuuqzuqtkyjc.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_2uW-VP-7G-zKMt8XVnRnVA_hsYOoxiw";
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // SYSTEM AUTHORITY HIERARCHY LEVELS
+        const ROLE_LEVELS = {
+            'Super Admin': 3,
+            'Admin': 2,
+            'User': 1
+        };
+
+        // DEFAULT FALLBACK STATE
+        const DEFAULT_STATE = {
+            settings: {
+                totalPrizePool: "Rp 15.000.000",
+                totalBranches: 4,
+                categories: [
+                    { id: "MQK", name: "Musabaqah Qiraatul Kutub (MQK)", icon: "fa-book-open-reader", description: "Membaca kitab kuning / kitab salaf bertema aqidah dan syariah." },
+                    { id: "CCI", name: "Cerdas Cermat Islam (CCI)", icon: "fa-brain", description: "Uji kecerdasan pengetahuan agama secara beregu/individu." },
+                    { id: "KKL", name: "Kompetisi Kaligrafi Lukis (KKL)", icon: "fa-palette", description: "Ekspresi seni melukis kaligrafi indah di atas kanvas." },
+                    { id: "KDM", name: "Kompetisi Da'i Muda (KDM)", icon: "fa-microphone", description: "Pidato Islami / syiar dakwah kreatif dengan pembawaan menarik." }
+                ]
+            },
+            registrants: [],
+            news: [],
+            users: [
+                { username: "superadmin", password: "superkompass", name: "Super Admin MAUDU", role: "Super Admin" },
+                { username: "admin", password: "adminkompass", name: "Kepala Madrasah", role: "Admin" },
+                { username: "user", password: "userkompass", name: "Staf Redaksi", role: "User" }
+            ]
+        };
+
+        let appState = JSON.parse(localStorage.getItem('KOMPASS_LOCAL_STATE')) || DEFAULT_STATE;
+        let currentUser = JSON.parse(sessionStorage.getItem('KOMPASS_SESSION')) || null;
+        let uploadedFileBase64 = "";
+        let editingUserTarget = null; // Storing user edit state
+
+        // NAVIGATION CONTROL
+        function navigateTo(viewId) {
+            document.querySelectorAll('.app-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.add('active');
+
+            document.getElementById('mobile-menu').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (viewId === 'home') renderPublicInterface();
+            if (viewId === 'news') renderNewsInterface();
+            if (viewId === 'register') initRegistrationForm();
+            if (viewId === 'dashboard') initDashboard();
+        }
+
+        // SYNC STATUS INDICATOR HELPERS
+        function updateSyncStatus(status) {
+            const syncIndicator = document.getElementById('sync-indicator');
+            const syncDot = document.getElementById('sync-dot');
+            const syncText = document.getElementById('sync-text');
+
+            if (status === 'connected') {
+                syncIndicator.className = "flex items-center gap-1.5 text-xs bg-emerald-800 px-3 py-1.5 rounded-full border border-emerald-700";
+                syncDot.className = "w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping";
+                syncText.innerText = "Supabase Aktif";
+            } else if (status === 'syncing') {
+                syncIndicator.className = "flex items-center gap-1.5 text-xs bg-amber-800 px-3 py-1.5 rounded-full border border-amber-700";
+                syncDot.className = "w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse";
+                syncText.innerText = "Menyinkronkan...";
+            } else {
+                syncIndicator.className = "flex items-center gap-1.5 text-xs bg-rose-800 px-3 py-1.5 rounded-full border border-rose-700";
+                syncDot.className = "w-2.5 h-2.5 bg-rose-400 rounded-full";
+                syncText.innerText = "Mode Lokal";
+            }
+        }
+
+        // SUPABASE REAL-TIME DATABASE SYNC
+        async function syncWithSupabase(action = 'pull') {
+            updateSyncStatus('syncing');
+            try {
+                if (action === 'push_settings') {
+                    await _supabase.from('kompass_settings').upsert({
+                        id: 'default',
+                        total_prize_pool: appState.settings.totalPrizePool,
+                        total_branches: appState.settings.totalBranches,
+                        categories: appState.settings.categories
+                    });
+                } else {
+                    // PULL SETTINGS
+                    const { data: settingsData, error: sErr } = await _supabase.from('kompass_settings').select('*').eq('id', 'default').single();
+                    if (!sErr && settingsData) {
+                        appState.settings = {
+                            totalPrizePool: settingsData.total_prize_pool,
+                            totalBranches: settingsData.total_branches,
+                            categories: settingsData.categories
+                        };
+                    } else if (sErr && sErr.code === 'PGRST116') {
+                        // Insert Default values if empty
+                        await _supabase.from('kompass_settings').insert({
+                            id: 'default',
+                            total_prize_pool: DEFAULT_STATE.settings.totalPrizePool,
+                            total_branches: DEFAULT_STATE.settings.totalBranches,
+                            categories: DEFAULT_STATE.settings.categories
+                        });
+                    }
+
+                    // PULL USERS
+                    const { data: usersData, error: uErr } = await _supabase.from('kompass_users').select('*');
+                    if (!uErr && usersData && usersData.length > 0) {
+                        appState.users = usersData;
+                    } else if (!uErr && usersData && usersData.length === 0) {
+                        await _supabase.from('kompass_users').insert(DEFAULT_STATE.users);
+                        appState.users = DEFAULT_STATE.users;
+                    }
+
+                    // PULL REGISTRANTS
+                    const { data: regData, error: rErr } = await _supabase.from('kompass_registrants').select('*');
+                    if (!rErr && regData) {
+                        appState.registrants = regData;
+                    }
+
+                    // PULL NEWS
+                    const { data: newsData, error: nErr } = await _supabase.from('kompass_news').select('*');
+                    if (!nErr && newsData) {
+                        appState.news = newsData;
+                    }
+                }
+                
+                localStorage.setItem('KOMPASS_LOCAL_STATE', JSON.stringify(appState));
+                updateSyncStatus('connected');
+            } catch (err) {
+                console.error("Supabase Database error: ", err);
+                updateSyncStatus('offline');
+            }
+            renderPublicInterface();
+            renderNewsInterface();
+        }
+
+        // RENDER DOM ELEMENTS
+        function renderPublicInterface() {
+            document.getElementById('stat-prizes').innerText = appState.settings.totalPrizePool;
+            document.getElementById('stat-branches').innerText = appState.settings.totalBranches;
+            
+            const approvedCount = appState.registrants.filter(r => r.status === 'Disetujui').length;
+            document.getElementById('stat-registrants').innerText = approvedCount;
+
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+            appState.settings.categories.forEach(cat => {
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition duration-300">
+                        <div class="bg-primary text-white p-6 text-center">
+                            <i class="fa-solid ${cat.icon || 'fa-trophy'} text-4xl text-secondary mb-3"></i>
+                            <h3 class="font-bold text-lg">${cat.name}</h3>
+                        </div>
+                        <div class="p-6 text-sm text-slate-600 leading-relaxed text-center">
+                            ${cat.description}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Adjust authentication buttons
+            const wrapper = document.getElementById('auth-nav-wrapper');
+            const mobileWrapper = document.getElementById('auth-nav-mobile');
+            if (currentUser) {
+                const btnHTML = `
+                    <button onclick="navigateTo('dashboard')" class="bg-emerald-800 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-950 transition duration-300">
+                        <i class="fa-solid fa-table-columns mr-1"></i> Dashboard
+                    </button>
+                `;
+                wrapper.innerHTML = btnHTML;
+                mobileWrapper.innerHTML = `<button onclick="navigateTo('dashboard')" class="block w-full text-center bg-emerald-800 text-white py-2 rounded-md font-medium">Dashboard</button>`;
+            } else {
+                const btnHTML = `
+                    <button onclick="openLoginModal()" class="bg-secondary text-white px-5 py-2 rounded-full font-semibold hover:bg-yellow-700 transition duration-300 shadow">
+                        <i class="fa-solid fa-right-to-bracket mr-1"></i> Login Admin
+                    </button>
+                `;
+                wrapper.innerHTML = btnHTML;
+                mobileWrapper.innerHTML = `<button onclick="openLoginModal()" class="block w-full text-center bg-secondary text-white py-2 rounded-md font-medium">Login Admin</button>`;
+            }
+        }
+
+        function renderNewsInterface() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '';
+            appState.news.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+                        <span class="text-xs font-semibold bg-emerald-100 text-primary px-2.5 py-1 rounded-full mb-3 inline-block">${item.date}</span>
+                        <h3 class="font-bold text-xl text-primary mb-3">${item.title}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line">${item.content}</p>
+                        <div class="text-xs text-slate-400 border-t pt-3 flex justify-between">
+                            <span>Ditulis oleh: <strong class="text-slate-500">${item.author}</strong></span>
+                            <span>KOMPASS Media</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const newsBtnWrapper = document.getElementById('btn-create-news-wrapper');
+            if (currentUser) {
+                newsBtnWrapper.innerHTML = `
+                    <button onclick="toggleNewsForm()" class="bg-primary text-white font-bold px-5 py-2.5 rounded-xl hover:bg-emerald-950 transition shadow text-xs sm:text-sm">
+                        <i class="fa-solid fa-edit mr-1"></i> Tulis Berita
+                    </button>
+                `;
+            } else {
+                newsBtnWrapper.innerHTML = '';
+            }
+        }
+
+        // REGISTRATION HANDLERS
+        function initRegistrationForm() {
+            document.getElementById('pendaftaran-form').reset();
+            document.getElementById('pendaftaran-form').classList.remove('hidden');
+            document.getElementById('registration-success').classList.add('hidden');
+            uploadedFileBase64 = "";
+            goToStep(1);
+
+            document.getElementById('upload-icon').className = "fa-solid fa-cloud-arrow-up text-4xl text-slate-400 mb-2";
+            document.getElementById('upload-text').innerText = "Seret file bukti bayar atau klik di sini untuk mengunggah";
+            document.getElementById('upload-text').className = "text-sm text-slate-600 font-medium";
+
+            const selectLomba = document.getElementById('reg-lomba');
+            selectLomba.innerHTML = '<option value="" disabled selected>Pilih cabang lomba</option>';
+            appState.settings.categories.forEach(cat => {
+                selectLomba.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+            });
+        }
+
+        function goToStep(step) {
+            const step1 = document.getElementById('form-step-1');
+            const step2 = document.getElementById('form-step-2');
+            const badge1 = document.getElementById('step-badge-1');
+            const badge2 = document.getElementById('step-badge-2');
+
+            if (step === 2) {
+                const nama = document.getElementById('reg-nama').value;
+                const nisn = document.getElementById('reg-nisn').value;
+                const sekolah = document.getElementById('reg-sekolah').value;
+                const kelas = document.getElementById('reg-kelas').value;
+                const wa = document.getElementById('reg-wa').value;
+                const lomba = document.getElementById('reg-lomba').value;
+
+                if (!nama || !nisn || !sekolah || !kelas || !wa || !lomba) {
+                    alert("Mohon lengkapi seluruh isian data peserta!");
+                    return;
+                }
+
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+                badge1.className = "px-3 py-1.5 rounded-full bg-slate-200 text-slate-500";
+                badge2.className = "px-3 py-1.5 rounded-full bg-primary text-white";
+            } else {
+                step1.classList.remove('hidden');
+                step2.classList.add('hidden');
+                badge1.className = "px-3 py-1.5 rounded-full bg-primary text-white";
+                badge2.className = "px-3 py-1.5 rounded-full bg-slate-200 text-slate-500";
+            }
+        }
+
+        document.getElementById('reg-bukti').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Ukuran file tidak boleh melampaui 2MB!");
+                this.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                uploadedFileBase64 = event.target.result;
+                document.getElementById('upload-icon').className = "fa-solid fa-file-circle-check text-4xl text-emerald-600 mb-2";
+                document.getElementById('upload-text').innerText = `Terunggah: ${file.name}`;
+                document.getElementById('upload-text').className = "text-sm text-emerald-600 font-bold";
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('pendaftaran-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!uploadedFileBase64) {
+                alert("Silakan unggah bukti transfer pendaftaran Anda terlebih dahulu!");
+                return;
+            }
+
+            updateSyncStatus('syncing');
+
+            const regId = `REG-${Date.now().toString().slice(-4)}`;
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            const newRegistrant = {
+                id: regId,
+                nama: document.getElementById('reg-nama').value,
+                nisn: document.getElementById('reg-nisn').value,
+                sekolah: document.getElementById('reg-sekolah').value,
+                kelas: document.getElementById('reg-kelas').value,
+                wa: document.getElementById('reg-wa').value,
+                lomba: document.getElementById('reg-lomba').value,
+                file: uploadedFileBase64,
+                status: "Pending"
+            };
+
+            // Save to Supabase
+            try {
+                const { error } = await _supabase.from('kompass_registrants').insert(newRegistrant);
+                if (error) throw error;
+                
+                await syncWithSupabase('pull');
+                document.getElementById('pendaftaran-form').classList.add('hidden');
+                document.getElementById('registration-success').classList.remove('hidden');
+            } catch (err) {
+                alert("Kesalahan menyimpan data ke Supabase: " + err.message);
+                updateSyncStatus('offline');
+            }
+        });
+
+        // NEWS ENGINE
+        function toggleNewsForm() {
+            document.getElementById('news-publisher-box').classList.toggle('hidden');
+        }
+
+        document.getElementById('news-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('news-title').value;
+            const content = document.getElementById('news-content').value;
+
+            const nextId = `NEWS-${Date.now().toString().slice(-4)}`;
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            try {
+                const { error } = await _supabase.from('kompass_news').insert({
+                    id: nextId,
+                    title: title,
+                    content: content,
+                    date: dateStr,
+                    author: currentUser ? currentUser.name : "Anonym"
+                });
+                if (error) throw error;
+
+                await syncWithSupabase('pull');
+                document.getElementById('news-form').reset();
+                toggleNewsForm();
+            } catch (err) {
+                alert("Gagal menambahkan berita: " + err.message);
+            }
+        });
+
+        // PORTAL LOGIN
+        function openLoginModal() {
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('login-form').reset();
+            document.getElementById('modal-login').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('modal-login').classList.add('hidden');
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userInp = document.getElementById('login-username').value.trim();
+            const passInp = document.getElementById('login-password').value;
+
+            const authenticatedUser = appState.users.find(u => u.username === userInp && u.password === passInp);
+
+            if (authenticatedUser) {
+                currentUser = authenticatedUser;
+                sessionStorage.setItem('KOMPASS_SESSION', JSON.stringify(currentUser));
+                closeLoginModal();
+                renderPublicInterface();
+                navigateTo('dashboard');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('KOMPASS_SESSION');
+            renderPublicInterface();
+            navigateTo('home');
+        }
+
+        // ADMIN DASHBOARD
+        function initDashboard() {
+            if (!currentUser) {
+                navigateTo('home');
+                return;
+            }
+
+            document.getElementById('dash-user-name').innerText = currentUser.name;
+            document.getElementById('dash-user-role').innerText = currentUser.role;
+
+            const tabSettings = document.getElementById('tab-btn-settings');
+            const tabUserMgt = document.getElementById('tab-btn-usermgt');
+
+            if (currentUser.role === 'User') {
+                tabSettings.classList.add('hidden');
+                tabUserMgt.classList.add('hidden');
+            } else {
+                tabSettings.classList.remove('hidden');
+                tabUserMgt.classList.remove('hidden');
+            }
+
+            switchDashTab('registrants');
+            populateSettingsForm();
+            renderDashboardRegistrants();
+            renderDashboardUserManagement();
+        }
+
+        function switchDashTab(tabName) {
+            document.querySelectorAll('.dash-tab').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => {
+                btn.className = "whitespace-nowrap px-4 py-2.5 sm:px-5 sm:py-3 font-semibold rounded-t-xl hover:bg-white text-slate-600 text-xs sm:text-sm";
+            });
+            document.getElementById(`tab-btn-${tabName}`).className = "whitespace-nowrap px-4 py-2.5 sm:px-5 sm:py-3 font-semibold rounded-t-xl bg-white border-t border-x border-slate-200 text-primary text-xs sm:text-sm";
+        }
+
+        function renderDashboardRegistrants() {
+            const tbody = document.getElementById('dash-registrants-tbody');
+            tbody.innerHTML = '';
+            
+            const filter = document.getElementById('filter-status').value;
+            const filteredData = appState.registrants.filter(r => {
+                if (filter === 'Semua') return true;
+                return r.status === filter;
+            });
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Tidak ada pendaftar ditemukan</td></tr>`;
+                return;
+            }
+
+            filteredData.forEach((r, idx) => {
+                let statusBadge = "";
+                if (r.status === "Pending") statusBadge = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-semibold text-xs"><i class="fa-regular fa-clock mr-1"></i>Pending</span>`;
+                if (r.status === "Disetujui") statusBadge = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold text-xs"><i class="fa-regular fa-circle-check mr-1"></i>Disetujui</span>`;
+                if (r.status === "Ditolak") statusBadge = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full font-semibold text-xs"><i class="fa-regular fa-circle-xmark mr-1"></i>Ditolak</span>`;
+
+                let actionBtnHTML = "";
+                if (currentUser && currentUser.role !== 'User') {
+                    actionBtnHTML = `
+                        <div class="flex flex-wrap items-center justify-center gap-1.5">
+                            <button onclick="viewRegistrantDetail('${r.id}')" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1.5 rounded-lg hover:bg-slate-200 font-bold transition">Detail</button>
+                            <button onclick="changeRegistrantStatus('${r.id}', 'Disetujui')" class="text-xs bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-emerald-700 font-bold transition">Setujui</button>
+                            <button onclick="changeRegistrantStatus('${r.id}', 'Ditolak')" class="text-xs bg-rose-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-rose-700 font-bold transition">Tolak</button>
+                        </div>
+                    `;
+                } else {
+                    actionBtnHTML = `
+                        <div class="flex items-center justify-center">
+                            <button onclick="viewRegistrantDetail('${r.id}')" class="text-xs bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 font-bold transition">Detail</button>
+                        </div>
+                    `;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b border-slate-50 transition">
+                        <td class="p-3 font-bold text-slate-800">${idx + 1}</td>
+                        <td class="p-3 font-semibold text-primary">${r.nama}</td>
+                        <td class="p-3 text-slate-500">${r.sekolah} (Kelas ${r.kelas})</td>
+                        <td class="p-3 text-slate-700 font-medium">${r.lomba}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3">${actionBtnHTML}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function viewRegistrantDetail(id) {
+            const r = appState.registrants.find(reg => reg.id === id);
+            if (!r) return;
+
+            const modalBody = document.getElementById('detail-modal-body');
+            let proofHTML = "";
+
+            if (r.file) {
+                if (r.file.startsWith("data:application/pdf")) {
+                    proofHTML = `<p class="text-xs text-slate-500 mb-2">Dokumen Bukti Transfer (PDF):</p>
+                    <a href="${r.file}" download="Bukti-${r.nama}.pdf" class="inline-flex items-center gap-2 bg-primary text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-emerald-950 transition">
+                        <i class="fa-solid fa-file-pdf"></i> Unduh File PDF Bukti Pembayaran
+                    </a>`;
+                } else {
+                    proofHTML = `<p class="text-xs text-slate-500 mb-2">Pratinjau Bukti Transfer:</p>
+                    <img src="${r.file}" alt="Bukti Transfer" class="w-full h-auto rounded-lg border border-slate-200 max-h-96 object-contain">`;
+                }
+            } else {
+                proofHTML = `<div class="bg-amber-50 text-amber-800 p-4 rounded-xl text-center border border-amber-200 text-xs font-semibold">
+                    <i class="fa-solid fa-triangle-exclamation text-lg mb-1 block"></i> Bukti Pembayaran tidak ditemukan
+                </div>`;
+            }
+
+            modalBody.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 border-b pb-4 text-xs sm:text-sm text-slate-700">
+                    <div>
+                        <p class="text-[10px] text-slate-400">ID Register</p>
+                        <p class="font-bold text-slate-800">${r.id}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400">Nama Lengkap</p>
+                        <p class="font-bold text-slate-800">${r.nama}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400">NISN</p>
+                        <p class="font-bold text-slate-800">${r.nisn}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400">Asal Sekolah</p>
+                        <p class="font-bold text-slate-800">${r.sekolah}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400">Hubungi WhatsApp</p>
+                        <a href="https://wa.me/${r.wa.replace(/\D/g,'')}" target="_blank" class="text-primary hover:underline font-bold inline-flex items-center gap-1">
+                            <i class="fa-brands fa-whatsapp text-emerald-600"></i> ${r.wa}
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400">Cabang Lomba</p>
+                        <p class="font-bold text-secondary">${r.lomba}</p>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    ${proofHTML}
+                </div>
+            `;
+
+            document.getElementById('modal-detail').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('modal-detail').classList.add('hidden');
+        }
+
+        async function changeRegistrantStatus(id, newStatus) {
+            try {
+                const { error } = await _supabase.from('kompass_registrants').update({ status: newStatus }).eq('id', id);
+                if (error) throw error;
+                await syncWithSupabase('pull');
+                renderDashboardRegistrants();
+            } catch (err) {
+                alert("Gagal memperbarui status: " + err.message);
+            }
+        }
+
+        // SETTINGS & EVENT STATS MANAGEMENT
+        function populateSettingsForm() {
+            document.getElementById('set-prizepool').value = appState.settings.totalPrizePool;
+            document.getElementById('set-branches-count').value = appState.settings.totalBranches;
+
+            const container = document.getElementById('set-categories-list');
+            container.innerHTML = '';
+            appState.settings.categories.forEach((cat, index) => {
+                container.innerHTML += `
+                    <div class="flex flex-col sm:flex-row gap-3 border-b pb-4 border-slate-100 items-start">
+                        <input type="hidden" name="cat-id-${index}" value="${cat.id}">
+                        <div class="w-full sm:w-1/3">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Nama Lomba</label>
+                            <input type="text" name="cat-name-${index}" value="${cat.name}" required class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none">
+                        </div>
+                        <div class="w-full sm:w-2/3">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Deskripsi Singkat</label>
+                            <input type="text" name="cat-desc-${index}" value="${cat.description}" required class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none">
+                        </div>
+                        <button type="button" onclick="removeCategoryRow(${index})" class="text-rose-600 text-sm font-bold mt-6 hover:underline"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        function addNewCategoryRow() {
+            const container = document.getElementById('set-categories-list');
+            const index = container.children.length;
+            const newId = `LOMBA-${index + 1}`;
+
+            const newRow = document.createElement('div');
+            newRow.className = "flex flex-col sm:flex-row gap-3 border-b pb-4 border-slate-100 items-start animate-fade-in w-full";
+            newRow.innerHTML = `
+                <input type="hidden" name="cat-id-${index}" value="${newId}">
+                <div class="w-full sm:w-1/3">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Nama Lomba</label>
+                    <input type="text" name="cat-name-${index}" placeholder="Contoh: Pidato Bahasa Inggris" required class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="w-full sm:w-2/3">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Deskripsi Singkat</label>
+                    <input type="text" name="cat-desc-${index}" placeholder="Keterangan singkat materi penilaian lomba" required class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none">
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 text-sm font-bold mt-6 hover:underline"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function removeCategoryRow(index) {
+            appState.settings.categories.splice(index, 1);
+            populateSettingsForm();
+        }
+
+        document.getElementById('settings-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            appState.settings.totalPrizePool = document.getElementById('set-prizepool').value;
+            appState.settings.totalBranches = parseInt(document.getElementById('set-branches-count').value);
+
+            const categoriesContainer = document.getElementById('set-categories-list');
+            const listCategories = [];
+            const rows = categoriesContainer.children;
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const idVal = row.querySelector('input[type="hidden"]').value;
+                const nameVal = row.querySelector(`input[name^="cat-name-"]`).value;
+                const descVal = row.querySelector(`input[name^="cat-desc-"]`).value;
+
+                listCategories.push({
+                    id: idVal,
+                    name: nameVal,
+                    icon: "fa-trophy",
+                    description: descVal
+                });
+            }
+
+            appState.settings.categories = listCategories;
+            
+            try {
+                await syncWithSupabase('push_settings');
+                alert("Pengaturan website dan cabang lomba berhasil disimpan!");
+                navigateTo('dashboard');
+            } catch (err) {
+                alert("Gagal sinkronisasi data: " + err.message);
+            }
+        });
+
+        // HIERARCHY USER MANAGEMENT & EDIT USER DATA FEATURE
+        function canEditUser(currUser, targetUser) {
+            if (!currUser || !targetUser) return false;
+            // Own account: always allowed
+            if (currUser.username === targetUser.username) return true;
+            // Levels: Super Admin > Admin > User
+            const currLevel = ROLE_LEVELS[currUser.role] || 0;
+            const targetLevel = ROLE_LEVELS[targetUser.role] || 0;
+            return currLevel > targetLevel;
+        }
+
+        function renderDashboardUserManagement() {
+            const tbody = document.getElementById('user-list-tbody');
+            tbody.innerHTML = '';
+
+            appState.users.forEach(user => {
+                let actionBtnHTML = "";
+                const editable = canEditUser(currentUser, user);
+
+                if (editable) {
+                    actionBtnHTML = `
+                        <div class="flex gap-1.5 justify-center">
+                            <button onclick="startEditUserMode('${user.username}')" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1 rounded transition">Edit</button>
+                            ${user.username !== currentUser.username ? `<button onclick="deleteUserAccount('${user.username}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-2 py-1 rounded transition">Hapus</button>` : ''}
+                        </div>
+                    `;
+                } else {
+                    actionBtnHTML = `<span class="text-xs text-slate-400 italic">Terkunci</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b border-slate-50 transition">
+                        <td class="p-3 font-semibold text-slate-700">${user.username}</td>
+                        <td class="p-3">${user.name}</td>
+                        <td class="p-3">
+                            <span class="text-[10px] px-2 py-1 rounded font-bold ${user.role === 'Super Admin' ? 'bg-purple-100 text-purple-800' : user.role === 'Admin' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-600'}">
+                                ${user.role}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center">${actionBtnHTML}</td>
+                    </tr>
+                `;
+            });
+
+            // Role option limitations on form loading
+            const roleSelect = document.getElementById('user-new-role');
+            roleSelect.innerHTML = '';
+            if (currentUser.role === 'Super Admin') {
+                roleSelect.innerHTML = `
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Super Admin">Super Admin</option>
+                `;
+            } else if (currentUser.role === 'Admin') {
+                roleSelect.innerHTML = `
+                    <option value="User">User</option>
+                `;
+            }
+        }
+
+        // Switch user form to EDIT mode
+        function startEditUserMode(username) {
+            const targetUser = appState.users.find(u => u.username === username);
+            if (!targetUser) return;
+
+            editingUserTarget = targetUser;
+            
+            document.getElementById('user-form-title').innerText = `Edit Pengguna: ${username}`;
+            document.getElementById('user-new-username').value = targetUser.username;
+            document.getElementById('user-new-username').disabled = true; // Disable editing primary key
+            document.getElementById('user-new-password').value = targetUser.password;
+            document.getElementById('user-new-fullname').value = targetUser.name;
+            document.getElementById('user-new-role').value = targetUser.role;
+
+            // Restrict changing own role to prevent lockout
+            if (targetUser.username === currentUser.username) {
+                document.getElementById('user-new-role').disabled = true;
+            } else {
+                document.getElementById('user-new-role').disabled = false;
+            }
+
+            document.getElementById('btn-cancel-edit-user').classList.remove('hidden');
+            document.getElementById('btn-submit-user').innerText = "Simpan Perubahan";
+        }
+
+        function cancelEditUserMode() {
+            editingUserTarget = null;
+            document.getElementById('user-form-title').innerText = "Tambah Pengguna Baru";
+            document.getElementById('user-new-username').disabled = false;
+            document.getElementById('user-new-role').disabled = false;
+            document.getElementById('user-mgt-form').reset();
+            document.getElementById('btn-cancel-edit-user').classList.add('hidden');
+            document.getElementById('btn-submit-user').innerText = "Tambah Akun";
+        }
+
+        document.getElementById('user-mgt-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const usernameInp = document.getElementById('user-new-username').value.trim().toLowerCase();
+            const passwordInp = document.getElementById('user-new-password').value;
+            const fullnameInp = document.getElementById('user-new-fullname').value;
+            const roleInp = document.getElementById('user-new-role').value;
+
+            try {
+                if (editingUserTarget) {
+                    // UPDATE OPERATION
+                    const { error } = await _supabase.from('kompass_users').update({
+                        password: passwordInp,
+                        name: fullnameInp,
+                        role: roleInp
+                    }).eq('username', editingUserTarget.username);
+
+                    if (error) throw error;
+                    alert("Akun pengguna berhasil diperbarui!");
+                    
+                    // Update session if editing self
+                    if (editingUserTarget.username === currentUser.username) {
+                        currentUser.name = fullnameInp;
+                        currentUser.role = roleInp;
+                        sessionStorage.setItem('KOMPASS_SESSION', JSON.stringify(currentUser));
+                    }
+                } else {
+                    // INSERT OPERATION
+                    const exist = appState.users.some(u => u.username === usernameInp);
+                    if (exist) {
+                        alert("Username telah terdaftar sebelumnya!");
+                        return;
+                    }
+
+                    const { error } = await _supabase.from('kompass_users').insert({
+                        username: usernameInp,
+                        password: passwordInp,
+                        name: fullnameInp,
+                        role: roleInp
+                    });
+                    if (error) throw error;
+                    alert("Akun baru berhasil ditambahkan!");
+                }
+
+                cancelEditUserMode();
+                await syncWithSupabase('pull');
+                renderDashboardUserManagement();
+            } catch (err) {
+                alert("Gagal memproses akun di Supabase: " + err.message);
+            }
+        });
+
+        async function deleteUserAccount(username) {
+            if (confirm(`Apakah Anda yakin ingin menghapus akun user: ${username}?`)) {
+                try {
+                    const { error } = await _supabase.from('kompass_users').delete().eq('username', username);
+                    if (error) throw error;
+                    await syncWithSupabase('pull');
+                    renderDashboardUserManagement();
+                } catch (err) {
+                    alert("Gagal menghapus akun: " + err.message);
+                }
+            }
+        }
+
+        // WINDOW STARTUP LOAD
+        window.addEventListener('load', () => {
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+            syncWithSupabase('pull');
+        });
+    </script>
+</body>
+</html>
