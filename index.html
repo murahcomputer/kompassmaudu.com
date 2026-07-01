@@ -40,6 +40,80 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden">
 
+<!-- MASUKKAN KODE INI DI BAGIAN PALING ATAS SETELAH TAG <body> -->
+<div id="blokir-kadaluarsa" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f4f6f9;
+    color: #333;
+    z-index: 9999999; /* Memastikan berada di paling depan */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 20px;
+">
+    <div style="
+        text-align: center;
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        max-width: 500px;
+        width: 100%;
+        box-sizing: border-box;
+    ">
+        <h1 style="color: #dc3545; margin: 0 0 10px 0; font-size: 28px; font-weight: bold;">Website Kadaluarsa / Mati</h1>
+        <p style="font-size: 18px; line-height: 1.6; color: #555; margin: 0 0 15px 0;">
+            Maaf, masa aktif website ini telah habis.
+        </p>
+        <p style="font-size: 16px; color: #777; margin: 0;">
+            Silahkan lakukan aktivasi kembali untuk dapat mengakses layanan kami.
+        </p>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Target kedaluwarsa: 1 Juli 2026, jam 19:30
+        const TANGGAL_KADALUARSA = new Date("2026-08-01T00:00:00");
+        const elemenBlokir = document.getElementById("blokir-kadaluarsa");
+
+        function kunciLayar() {
+            if (elemenBlokir) {
+                elemenBlokir.style.setProperty("display", "flex", "important");
+                // Mengunci scroll halaman utama di belakangnya
+                document.body.style.overflow = "hidden"; 
+            }
+        }
+
+        // 1. Cek instan lewat waktu lokal perangkat (agar langsung terkunci di lokal/browser)
+        const waktuLokal = new Date();
+        if (waktuLokal >= TANGGAL_KADALUARSA) {
+            kunciLayar();
+        } else {
+            // 2. Jika lolos waktu lokal, validasi ulang pakai waktu server internet (Anti-cheat saat di GitHub Pages)
+            fetch("https://worldtimeapi.org/api/ip")
+                .then(response => response.json())
+                .then(data => {
+                    const waktuServer = new Date(data.datetime);
+                    if (waktuServer >= TANGGAL_KADALUARSA) {
+                        kunciLayar();
+                    }
+                })
+                .catch(error => {
+                    console.log("Membuka di lokal atau API sibuk, mengandalkan waktu perangkat.");
+                });
+        }
+    })();
+</script>
+<!-- KODE WEBSITE ASLI ANDA BERLANJUT DI BAWAH INI -->
+
+    
     <!-- NAVBAR -->
     <nav class="bg-primary text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
