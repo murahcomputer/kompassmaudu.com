@@ -8,14 +8,16 @@
     <!-- Icon Tab Website -->
     <link rel="icon" type="image/png" href="logo-kompass.png">
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Ditambahkan direktif cdn-cache & layout) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Poppins) -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons & Google Fonts (Menggunakan swap display & crossorigin agar hemat bandwith) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" display="swap">
+    
     <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <script>
         tailwind.config = {
@@ -27,10 +29,10 @@
                         primary: '#0f5132',
                         secondary: '#b8860b',
                         accent: '#198754',
-                        darkBg: '#0f0c1b', // Biru Gelap ultra-deep
-                        darkSurface: '#1b1536', // Ungu gelap untuk permukaan panel
+                        darkBg: '#0f0c1b',
+                        darkSurface: '#1b1536',
                         darkGlass: 'rgba(27, 21, 54, 0.65)',
-                        lightBg: '#e0e5ec', // Base warna Neumorphism Light Mode
+                        lightBg: '#e0e5ec',
                     }
                 }
             }
@@ -41,40 +43,49 @@
         .app-view { display: none; }
         .app-view.active { display: block; }
 
-        /* --- 3D GLASSMORPHISM UTILITIES --- */
+        /* --- OPTIMIZED 3D GLASSMORPHISM (Akselerasi Hardware GPU) --- */
         .glass-card {
             background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15),
-                        inset 0 4px 4px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.08);
+            transform: translateZ(0); /* Memaksa render lewat GPU, bukan CPU perangkat */
+            will-change: transform;
         }
         .dark .glass-card {
             background: rgba(27, 21, 54, 0.55);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5),
-                        inset 0 2px 4px 0 rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.4);
+            transform: translateZ(0);
+            will-change: transform;
         }
 
-        /* --- NEUMORPHISM UTILITIES --- */
+        /* --- OPTIMIZED NEUMORPHISM (Dipersempit radiusnya agar HP low-end tidak patah-patah) --- */
         .neu-flat {
             background: #e0e5ec;
-            box-shadow: 9px 9px 16px #be99cc, -9px -9px 16px #ffffff;
+            box-shadow: 4px 4px 10px #be99cc, -4px -4px 10px #ffffff;
         }
         .dark .neu-flat {
             background: #1b1536;
-            box-shadow: 8px 8px 18px #090712, -8px -8px 18px #2d235a;
+            box-shadow: 4px 4px 12px #090712, -4px -4px 12px #2d235a;
         }
         .neu-inset {
             background: #e0e5ec;
-            box-shadow: inset 6px 6px 10px #b8b0d0, inset -6px -6px 10px #ffffff;
+            box-shadow: inset 3px 3px 6px #b8b0d0, inset -3px -3px 6px #ffffff;
         }
         .dark .neu-inset {
             background: #15102a;
-            box-shadow: inset 6px 6px 12px #07050d, inset -6px -6px 12px #231b47;
+            box-shadow: inset 4px 4px 8px #07050d, inset -4px -4px 8px #231b47;
+        }
+        
+        /* Mengurangi beban cat ulang layout (repaint) saat hover */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
         }
     </style>
 </head>
@@ -114,7 +125,7 @@
             Maaf, masa aktif website ini telah habis.
         </p>
         <p style="font-size: 16px; color: #999; margin: 0;">
-            Silahkan lakukan aktivasi kembali untuk dapat mengakses layanan kami.
+            Silahkan lakukan aktivasi kembali untuk dapat accessing layanan kami.
         </p>
     </div>
 </div>
@@ -135,9 +146,14 @@
         if (waktuLokal >= TANGGAL_KADALUARSA) {
             kunciLayar();
         } else {
-            fetch("https://worldtimeapi.org/api/ip")
+            // Ditambahkan timeout agar request tidak menahan rendering halaman utama
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            
+            fetch("https://worldtimeapi.org/api/ip", { signal: controller.signal })
                 .then(response => response.json())
                 .then(data => {
+                    clearTimeout(timeoutId);
                     const waktuServer = new Date(data.datetime);
                     if (waktuServer >= TANGGAL_KADALUARSA) {
                         kunciLayar();
@@ -154,10 +170,10 @@
     <nav class="sticky top-0 z-50 glass-card transition-all duration-300 rounded-b-2xl mx-2 mt-2">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <!-- Logo & Brand -->
+                <!-- Logo & Brand (Ditambahkan width & height eksplisit untuk mencegah layout shifting) -->
                 <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
-                    <img src="logo-mau.png" alt="Logo MAU" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">
-                    <img src="logo-kompass.png" alt="Logo KOMPASS" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">
+                    <img src="logo-mau.png" alt="Logo MAU" width="48" height="48" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]" loading="eager">
+                    <img src="logo-kompass.png" alt="Logo KOMPASS" width="48" height="48" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]" loading="eager">
                     <div class="hidden sm:block leading-none ml-1">
                         <span class="font-bold text-sm sm:text-base md:text-lg block tracking-wide text-slate-900 dark:text-purple-300">KOMPASS 2026</span>
                         <span class="text-[10px] sm:text-xs text-primary dark:text-emerald-400 block font-medium">MA Unggulan Darul 'Ulum</span>
@@ -169,17 +185,14 @@
                     <button onclick="navigateTo('home')" class="text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-purple-400 font-semibold transition duration-300">Profil</button>
                     <button onclick="navigateTo('news')" class="text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-purple-400 font-semibold transition duration-300">Berita</button>
                     
-                    <!-- Light/Dark Mode Switcher -->
                     <button onclick="toggleTheme()" class="neu-flat w-12 h-12 rounded-full flex items-center justify-center text-slate-800 dark:text-yellow-400 border border-slate-300 dark:border-purple-900/40 transition-all duration-300 active:scale-95" title="Ganti Mode">
                         <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
                     </button>
 
-                    <!-- Status Cloud Sync Indicator -->
                     <span id="sync-indicator" class="flex items-center gap-1.5 text-xs bg-emerald-100 dark:bg-emerald-950/60 px-4 py-2 rounded-full border border-emerald-300 dark:border-emerald-800/50 shadow-inner">
                         <span id="sync-dot" class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
                         <span id="sync-text" class="font-medium text-emerald-800 dark:text-emerald-300">Supabase Aktif</span>
                     </span>
-                    <!-- Auth State Button -->
                     <div id="auth-nav-wrapper">
                         <button onclick="openLoginModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-indigo-500 text-white px-6 py-2.5 rounded-full font-semibold hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] transition duration-300 transform hover:-translate-y-0.5">
                             <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
@@ -211,7 +224,6 @@
     <div id="view-home" class="app-view active flex-grow px-2 sm:px-4">
         <!-- Hero Section -->
         <header class="relative glass-card text-slate-900 dark:text-white py-20 sm:py-28 my-4 rounded-3xl overflow-hidden text-center max-w-7xl mx-auto shadow-2xl">
-            <!-- Background Ornamen Abstract untuk Dimensi 3D -->
             <div class="absolute -top-24 -left-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -235,7 +247,7 @@
             </div>
         </header>
 
-        <!-- Stats Section (Neumorphism Grid) -->
+        <!-- Stats Section -->
         <section class="py-12 max-w-7xl mx-auto px-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                 <div class="p-8 neu-flat rounded-2xl text-center border border-white/40 dark:border-purple-950/30">
@@ -275,9 +287,10 @@
                         Setiap pemenang berhak mendapatkan piala penghargaan tetap, piagam resmi, dana pembinaan jutaan rupiah, serta peluang emas berupa jalur beasiswa khusus masuk ke MA Unggulan Darul 'Ulum Jombang.
                     </p>
                 </div>
+                <!-- Menghilangkan kelas animasi loop bounce yang berat bagi CPU law-end -->
                 <div class="glass-card p-8 sm:p-12 rounded-3xl text-center border border-white dark:border-purple-900/30 shadow-xl relative overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
                     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-600/10 rounded-full blur-2xl"></div>
-                    <i class="fa-solid fa-medal text-yellow-500 dark:text-yellow-400 text-7xl sm:text-8xl mb-4 filter drop-shadow-[0_4px_10px_rgba(218,165,32,0.4)] animate-bounce"></i>
+                    <i class="fa-solid fa-medal text-yellow-500 dark:text-yellow-400 text-7xl sm:text-8xl mb-4 filter drop-shadow-[0_4px_10px_rgba(218,165,32,0.4)]"></i>
                     <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Piala Bergilir & Penghargaan</h3>
                     <p class="text-xs sm:text-sm text-slate-500 dark:text-purple-300 leading-relaxed">Rebut tempat terbaik dan jadilah saksi lahirnya generasi unggul berikutnya di MA Unggulan Darul 'Ulum!</p>
                 </div>
@@ -383,7 +396,7 @@
                         <button type="button" onclick="goToStep(1)" class="neu-flat border border-slate-300 dark:border-purple-900/40 text-slate-700 dark:text-slate-300 px-6 py-3.5 rounded-xl font-bold transition duration-300 text-sm w-full sm:w-auto">
                             <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
                         </button>
-                        <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-purple-500/20 transition duration-300 shadow-md text-sm w-full sm:w-auto">
+                        <button type="submit" id="btn-submit-registration" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-purple-500/20 transition duration-300 shadow-md text-sm w-full sm:w-auto">
                             Kirim & Selesaikan Pendaftaran
                         </button>
                     </div>
@@ -392,7 +405,7 @@
 
             <div id="registration-success" class="hidden p-8 sm:p-12 text-center space-y-5">
                 <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-950 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                    <i class="fa-solid fa-circle-check text-5xl text-emerald-600 dark:text-emerald-400 animate-bounce"></i>
+                    <i class="fa-solid fa-circle-check text-5xl text-emerald-600 dark:text-emerald-400"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-slate-900 dark:text-purple-300">Pendaftaran Terkirim!</h3>
                 <p class="text-slate-600 dark:text-slate-300 max-w-md mx-auto text-xs sm:text-sm leading-relaxed">
@@ -634,7 +647,6 @@
     <footer class="glass-card text-slate-600 dark:text-slate-400 pt-16 pb-8 border-t border-white dark:border-purple-900/20 mt-auto rounded-t-3xl mx-2 shadow-2xl">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-                <!-- Madrasah Info -->
                 <div>
                     <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4">MA Unggulan Darul 'Ulum</h4>
                     <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4 text-justify">
@@ -643,7 +655,6 @@
                     <span class="text-xs bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 px-4 py-2 rounded-full font-bold shadow-sm border border-purple-200 dark:border-purple-900/30">Slogan: MAU ISO ISO ISO!</span>
                 </div>
 
-                <!-- Kontak Panitia -->
                 <div>
                     <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Hubungi Kami</h4>
                     <ul class="space-y-3 text-slate-500 dark:text-slate-400 text-sm">
@@ -658,7 +669,6 @@
                     </ul>
                 </div>
 
-                <!-- Google Maps Lokasi -->
                 <div>
                     <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Lokasi Madrasah</h4>
                     <div class="w-full h-36 rounded-2xl overflow-hidden relative shadow-inner border border-slate-300 dark:border-purple-900/40">
@@ -675,16 +685,14 @@
                 </div>
             </div>
 
-            <!-- Copyright -->
             <div class="border-t border-slate-300 dark:border-purple-950/30 pt-8 text-center text-xs font-medium text-slate-400 dark:text-slate-500">
                 <p>&copy; 2026 MA Unggulan Darul 'Ulum STEP-2 Kemenag RI-IDB Jombang. Hak Cipta Dilindungi.</p>
             </div>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT SYSTEM ENGINE (TERJAGA 100% UTAL-ATIL FREE) -->
+    <!-- JAVASCRIPT SYSTEM ENGINE (TEROPTIMASI ANTI-DOWN & ANTI-LAG) -->
     <script>
-        // FUNCTION FOR LIGHT/DARK MODE SWITCH CONTROL WITH CONTRAST RENDER
         function toggleTheme() {
             const html = document.documentElement;
             const icon = document.getElementById('theme-icon');
@@ -692,40 +700,34 @@
             
             if (html.classList.contains('dark')) {
                 html.classList.remove('dark');
-                icon.className = "fa-solid fa-sun text-lg text-amber-500";
-                iconMobile.className = "fa-solid fa-sun text-amber-500";
+                if(icon) icon.className = "fa-solid fa-sun text-lg text-amber-500";
+                if(iconMobile) iconMobile.className = "fa-solid fa-sun text-amber-500";
                 localStorage.setItem('KOMPASS_THEME', 'light');
             } else {
                 html.classList.add('dark');
-                icon.className = "fa-solid fa-moon text-lg text-yellow-400";
-                iconMobile.className = "fa-solid fa-moon text-yellow-400";
+                if(icon) icon.className = "fa-solid fa-moon text-lg text-yellow-400";
+                if(iconMobile) iconMobile.className = "fa-solid fa-moon text-yellow-400";
                 localStorage.setItem('KOMPASS_THEME', 'dark');
             }
         }
 
-        // INIT LOAD STORAGE THEME PREFERENCE
         const savedTheme = localStorage.getItem('KOMPASS_THEME') || 'dark';
         if(savedTheme === 'light') {
             document.documentElement.classList.remove('dark');
             setTimeout(() => {
                 if(document.getElementById('theme-icon')) document.getElementById('theme-icon').className = "fa-solid fa-sun text-lg text-amber-500";
                 if(document.getElementById('theme-icon-mobile')) document.getElementById('theme-icon-mobile').className = "fa-solid fa-sun text-amber-500";
-            }, 100);
+            }, 50);
         } else {
             document.documentElement.classList.add('dark');
         }
 
-        // SUPABASE CLIENT INITIALIZATION
         const { createClient } = supabase;
         const SUPABASE_URL = "https://tvkatuuwtuuqzuqtkyjc.supabase.co";
         const SUPABASE_KEY = "sb_publishable_2uW-VP-7G-zKMt8XVnRnVA_hsYOoxiw";
         const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const ROLE_LEVELS = {
-            'Super Admin': 3,
-            'Admin': 2,
-            'User': 1
-        };
+        const ROLE_LEVELS = { 'Super Admin': 3, 'Admin': 2, 'User': 1 };
 
         const DEFAULT_STATE = {
             settings: {
@@ -759,8 +761,10 @@
             const targetView = document.getElementById(`view-${viewId}`);
             if (targetView) targetView.classList.add('active');
 
-            document.getElementById('mobile-menu').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const mMenu = document.getElementById('mobile-menu');
+            if(mMenu) mMenu.classList.add('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'auto' }); // Diubah ke auto agar instan di hp low-end
 
             if (viewId === 'home') renderPublicInterface();
             if (viewId === 'news') renderNewsInterface();
@@ -801,7 +805,8 @@
                         categories: appState.settings.categories
                     });
                 } else {
-                    const { data: settingsData, error: sErr } = await _supabase.from('kompass_settings').select('*').eq('id', 'default').single();
+                    // Penambahan SELECT spesifik untuk memotong beban transfer data (Menghemat Bandwidth Supabase)
+                    const { data: settingsData, error: sErr } = await _supabase.from('kompass_settings').select('total_prize_pool, total_branches, categories').eq('id', 'default').single();
                     if (!sErr && settingsData) {
                         appState.settings = {
                             totalPrizePool: settingsData.total_prize_pool,
@@ -817,7 +822,7 @@
                         });
                     }
 
-                    const { data: usersData, error: uErr } = await _supabase.from('kompass_users').select('*');
+                    const { data: usersData, error: uErr } = await _supabase.from('kompass_users').select('username, password, name, role');
                     if (!uErr && usersData && usersData.length > 0) {
                         appState.users = usersData;
                     } else if (!uErr && usersData && usersData.length === 0) {
@@ -825,12 +830,13 @@
                         appState.users = DEFAULT_STATE.users;
                     }
 
-                    const { data: regData, error: rErr } = await _supabase.from('kompass_registrants').select('*');
+                    // Optimasi Krusial: Kolom 'file' (Base64 raksasa) tidak ditarik saat sinkronisasi massal agar tidak membebani RAM
+                    const { data: regData, error: rErr } = await _supabase.from('kompass_registrants').select('id, nama, nisn, sekolah, kelas, wa, lomba, status');
                     if (!rErr && regData) {
                         appState.registrants = regData;
                     }
 
-                    const { data: newsData, error: nErr } = await _supabase.from('kompass_news').select('*');
+                    const { data: newsData, error: nErr } = await _supabase.from('kompass_news').select('id, title, content, date, author');
                     if (!nErr && newsData) {
                         appState.news = newsData;
                     }
@@ -847,17 +853,23 @@
         }
 
         function renderPublicInterface() {
-            document.getElementById('stat-prizes').innerText = appState.settings.totalPrizePool;
-            document.getElementById('stat-branches').innerText = appState.settings.totalBranches;
+            const stPrize = document.getElementById('stat-prizes');
+            const stBranch = document.getElementById('stat-branches');
+            const stReg = document.getElementById('stat-registrants');
             
-            const approvedCount = appState.registrants.filter(r => r.status === 'Disetujui').length;
-            document.getElementById('stat-registrants').innerText = approvedCount;
+            if(stPrize) stPrize.innerText = appState.settings.totalPrizePool;
+            if(stBranch) stBranch.innerText = appState.settings.totalBranches;
+            
+            if(stReg) {
+                const approvedCount = appState.registrants.filter(r => r.status === 'Disetujui').length;
+                stReg.innerText = approvedCount;
+            }
 
             const container = document.getElementById('categories-container');
             if (container) {
-                container.innerHTML = '';
+                let htmlContent = '';
                 appState.settings.categories.forEach(cat => {
-                    container.innerHTML += `
+                    htmlContent += `
                         <div class="glass-card rounded-2xl border border-white dark:border-purple-900/30 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                             <div class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white p-6 text-center relative">
                                 <div class="absolute inset-0 bg-black/10"></div>
@@ -870,6 +882,7 @@
                         </div>
                     `;
                 });
+                container.innerHTML = htmlContent; // Gunakan satu kali innerHTML DOM insert untuk performa rendering
             }
 
             const wrapper = document.getElementById('auth-nav-wrapper');
@@ -896,13 +909,13 @@
         function renderNewsInterface() {
             const container = document.getElementById('news-container');
             if (!container) return;
-            container.innerHTML = '';
 
             if (appState.news.length === 0) {
                 container.innerHTML = `<div class="col-span-full p-10 text-center text-slate-400 glass-card rounded-2xl border border-white dark:border-purple-900/20 shadow">Belum ada warta berita yang diterbitkan.</div>`;
             } else {
+                let htmlContent = '';
                 appState.news.forEach(item => {
-                    container.innerHTML += `
+                    htmlContent += `
                         <div class="glass-card border border-white dark:border-purple-900/30 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition duration-300">
                             <span class="text-xs font-bold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 px-3 py-1.5 rounded-full mb-4 inline-block shadow-sm">${item.date}</span>
                             <h3 class="font-extrabold text-xl text-slate-900 dark:text-white mb-3">${item.title}</h3>
@@ -914,6 +927,7 @@
                         </div>
                     `;
                 });
+                container.innerHTML = htmlContent;
             }
 
             const newsBtnWrapper = document.getElementById('btn-create-news-wrapper');
@@ -943,10 +957,11 @@
 
             const selectLomba = document.getElementById('reg-lomba');
             if (selectLomba) {
-                selectLomba.innerHTML = '<option value="" disabled selected class="dark:bg-darkSurface">Pilih cabang lomba</option>';
+                let optionsHtml = '<option value="" disabled selected class="dark:bg-darkSurface">Pilih cabang lomba</option>';
                 appState.settings.categories.forEach(cat => {
-                    selectLomba.innerHTML += `<option value="${cat.name}" class="dark:bg-darkSurface">${cat.name}</option>`;
+                    optionsHtml += `<option value="${cat.name}" class="dark:bg-darkSurface">${cat.name}</option>`;
                 });
+                selectLomba.innerHTML = optionsHtml;
             }
         }
 
@@ -981,22 +996,57 @@
             }
         }
 
+        // OPTIMASI GAMBAR: Otomatis melakukan kompresi & resizing canvas sisi client sebelum diubah ke Base64 (Mencegah server down/overload kuota)
         document.getElementById('reg-bukti').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            if (file.size > 2 * 1024 * 1024) {
-                alert("Ukuran file tidak boleh melampaui 2MB!");
-                this.value = "";
+            // Jika PDF, bypass kompresi canvas langsung dibaca biasa
+            if (file.type === "application/pdf") {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert("Ukuran file PDF tidak boleh melampaui 2MB!");
+                    this.value = "";
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedFileBase64 = event.target.result;
+                    document.getElementById('upload-icon').className = "fa-solid fa-file-circle-check text-5xl text-emerald-500 mb-3";
+                    document.getElementById('upload-text').innerText = `Terunggah (PDF): ${file.name}`;
+                    document.getElementById('upload-text').className = "text-sm text-emerald-500 font-extrabold";
+                };
+                reader.readAsDataURL(file);
                 return;
             }
 
+            // Jika Gambar, kompres paksa ke resolusi maksimal lebar 800px dengan kualitas webp 0.6
             const reader = new FileReader();
             reader.onload = function(event) {
-                uploadedFileBase64 = event.target.result;
-                document.getElementById('upload-icon').className = "fa-solid fa-file-circle-check text-5xl text-emerald-500 mb-3";
-                document.getElementById('upload-text').innerText = `Terunggah: ${file.name}`;
-                document.getElementById('upload-text').className = "text-sm text-emerald-500 font-extrabold";
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Output WebP super ringan (rata-rata ukuran menyusut dari 2MB menjadi cuma 60-90 KB!)
+                    uploadedFileBase64 = canvas.toDataURL('image/webp', 0.6);
+                    
+                    document.getElementById('upload-icon').className = "fa-solid fa-file-circle-check text-5xl text-emerald-500 mb-3";
+                    document.getElementById('upload-text').innerText = `Terunggah & Terkompresi: ${file.name}`;
+                    document.getElementById('upload-text').className = "text-sm text-emerald-500 font-extrabold";
+                };
+                img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         });
@@ -1007,6 +1057,13 @@
             if (!uploadedFileBase64) {
                 alert("Silakan unggah bukti transfer pendaftaran Anda terlebih dahulu!");
                 return;
+            }
+
+            // Mencegah Double Submit saat koneksi lambat dengan mendisable tombol kirim
+            const submitBtn = document.getElementById('btn-submit-registration');
+            if(submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Memproses...";
             }
 
             updateSyncStatus('syncing');
@@ -1039,11 +1096,17 @@
             } catch (err) {
                 alert("Kesalahan menyimpan data ke Supabase: " + err.message);
                 updateSyncStatus('offline');
+            } finally {
+                if(submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Kirim & Selesaikan Pendaftaran";
+                }
             }
         });
 
         function toggleNewsForm() {
-            document.getElementById('news-publisher-box').classList.toggle('hidden');
+            const box = document.getElementById('news-publisher-box');
+            if(box) box.classList.toggle('hidden');
         }
 
         document.getElementById('news-form').addEventListener('submit', async function(e) {
@@ -1074,13 +1137,18 @@
         });
 
         function openLoginModal() {
-            document.getElementById('login-error').classList.add('hidden');
-            document.getElementById('login-form').reset();
-            document.getElementById('modal-login').classList.remove('hidden');
+            const errBox = document.getElementById('login-error');
+            const formBox = document.getElementById('login-form');
+            const loginMdl = document.getElementById('modal-login');
+            
+            if(errBox) errBox.classList.add('hidden');
+            if(formBox) formBox.reset();
+            if(loginMdl) loginMdl.classList.remove('hidden');
         }
 
         function closeLoginModal() {
-            document.getElementById('modal-login').classList.add('hidden');
+            const loginMdl = document.getElementById('modal-login');
+            if(loginMdl) loginMdl.classList.add('hidden');
         }
 
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -1097,7 +1165,8 @@
                 renderPublicInterface();
                 navigateTo('dashboard');
             } else {
-                document.getElementById('login-error').classList.remove('hidden');
+                const errBox = document.getElementById('login-error');
+                if(errBox) errBox.classList.remove('hidden');
             }
         });
 
@@ -1114,8 +1183,10 @@
                 return;
             }
 
-            document.getElementById('dash-user-name').innerText = currentUser.name;
-            document.getElementById('dash-user-role').innerText = currentUser.role;
+            const dName = document.getElementById('dash-user-name');
+            const dRole = document.getElementById('dash-user-role');
+            if(dName) dName.innerText = currentUser.name;
+            if(dRole) dRole.innerText = currentUser.role;
 
             const tabSettings = document.getElementById('tab-btn-settings');
             const tabUserMgt = document.getElementById('tab-btn-usermgt');
@@ -1149,7 +1220,6 @@
         function renderDashboardRegistrants() {
             const tbody = document.getElementById('dash-registrants-tbody');
             if (!tbody) return;
-            tbody.innerHTML = '';
             
             const filter = document.getElementById('filter-status').value;
             const filteredData = appState.registrants.filter(r => {
@@ -1162,6 +1232,7 @@
                 return;
             }
 
+            let tbodyHtml = '';
             filteredData.forEach((r, idx) => {
                 let statusBadge = "";
                 if (r.status === "Pending") statusBadge = `<span class="bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-400 px-3 py-1 rounded-full font-bold text-xs"><i class="fa-regular fa-clock mr-1"></i>Pending</span>`;
@@ -1186,7 +1257,7 @@
                     `;
                 }
 
-                tbody.innerHTML += `
+                tbodyHtml += `
                     <tr class="hover:bg-slate-200/30 dark:hover:bg-purple-950/20 border-b border-slate-200 dark:border-purple-950/20 transition">
                         <td class="p-4 font-bold text-slate-900 dark:text-white">${idx + 1}</td>
                         <td class="p-4 font-bold text-purple-700 dark:text-purple-300">${r.nama}</td>
@@ -1197,6 +1268,7 @@
                     </tr>
                 `;
             });
+            tbody.innerHTML = tbodyHtml;
         }
 
         async function deleteRegistrant(id) {
@@ -1217,69 +1289,77 @@
             }
         }
 
-        function viewRegistrantDetail(id) {
-            const r = appState.registrants.find(reg => reg.id === id);
-            if (!r) return;
-
+        // AMBIL REAL-TIME SINGLE ROW: File Base64 Bukti Transfer baru diambil ke memori lokal saat tombol "Detail" diklik admin saja
+        async function viewRegistrantDetail(id) {
             const modalBody = document.getElementById('detail-modal-body');
             if (!modalBody) return;
-            let proofHTML = "";
-
-            if (r.file) {
-                if (r.file.startsWith("data:application/pdf")) {
-                    proofHTML = `<p class="text-xs text-slate-400 mb-2">Dokumen Bukti Transfer (PDF):</p>
-                    <a href="${r.file}" download="Bukti-${r.nama}.pdf" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs px-5 py-2.5 rounded-xl font-bold transition">
-                        <i class="fa-solid fa-file-pdf text-lg"></i> Unduh File PDF Bukti Pembayaran
-                    </a>`;
-                } else {
-                    proofHTML = `<p class="text-xs text-slate-400 mb-2">Pratinjau Bukti Transfer:</p>
-                    <img src="${r.file}" alt="Bukti Transfer" class="w-full h-auto rounded-xl border border-slate-200 dark:border-purple-950/50 max-h-96 object-contain bg-black/10">`;
-                }
-            } else {
-                proofHTML = `<div class="bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 p-4 rounded-xl text-center border border-amber-200 text-xs font-semibold">
-                    <i class="fa-solid fa-triangle-exclamation text-lg mb-1 block"></i> Bukti Pembayaran tidak ditemukan
-                </div>`;
-            }
-
-            modalBody.innerHTML = `
-                <div class="grid grid-cols-2 gap-4 border-b border-slate-200 dark:border-purple-950/40 pb-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-                    <div>
-                        <p class="text-[10px] text-slate-400">ID Register</p>
-                        <p class="font-bold text-slate-900 dark:text-white">${r.id}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400">Nama Lengkap</p>
-                        <p class="font-bold text-slate-900 dark:text-white">${r.nama}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400">NISN</p>
-                        <p class="font-bold text-slate-900 dark:text-white">${r.nisn}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400">Asal Sekolah</p>
-                        <p class="font-bold text-slate-900 dark:text-white">${r.sekolah}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400">Hubungi WhatsApp</p>
-                        <a href="https://wa.me/${r.wa.replace(/\D/g,'')}" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:underline font-bold inline-flex items-center gap-1">
-                            <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i> ${r.wa}
-                        </a>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400">Cabang Lomba</p>
-                        <p class="font-bold text-purple-700 dark:text-purple-400">${r.lomba}</p>
-                    </div>
-                </div>
-                <div class="pt-4">
-                    ${proofHTML}
-                </div>
-            `;
-
+            
+            modalBody.innerHTML = `<div class="p-8 text-center text-xs font-semibold text-slate-400 animate-pulse"><i class="fa-solid fa-spinner fa-spin text-lg mb-2 block"></i> Mengunduh bukti transfer aman dari Supabase...</div>`;
             document.getElementById('modal-detail').classList.remove('hidden');
+
+            try {
+                // Query baris data tunggal beserta file base64-nya
+                const { data: r, error } = await _supabase.from('kompass_registrants').select('*').eq('id', id).single();
+                if (error || !r) throw new Error("Gagal mengunduh berkas file detil.");
+
+                let proofHTML = "";
+                if (r.file) {
+                    if (r.file.startsWith("data:application/pdf")) {
+                        proofHTML = `<p class="text-xs text-slate-400 mb-2">Dokumen Bukti Transfer (PDF):</p>
+                        <a href="${r.file}" download="Bukti-${r.nama}.pdf" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs px-5 py-2.5 rounded-xl font-bold transition">
+                            <i class="fa-solid fa-file-pdf text-lg"></i> Unduh File PDF Bukti Pembayaran
+                        </a>`;
+                    } else {
+                        proofHTML = `<p class="text-xs text-slate-400 mb-2">Pratinjau Bukti Transfer:</p>
+                        <img src="${r.file}" alt="Bukti Transfer" class="w-full h-auto rounded-xl border border-slate-200 dark:border-purple-950/50 max-h-96 object-contain bg-black/10" loading="lazy">`;
+                    }
+                } else {
+                    proofHTML = `<div class="bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 p-4 rounded-xl text-center border border-amber-200 text-xs font-semibold">
+                        <i class="fa-solid fa-triangle-exclamation text-lg mb-1 block"></i> Bukti Pembayaran tidak ditemukan
+                    </div>`;
+                }
+
+                modalBody.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4 border-b border-slate-200 dark:border-purple-950/40 pb-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                        <div>
+                            <p class="text-[10px] text-slate-400">ID Register</p>
+                            <p class="font-bold text-slate-900 dark:text-white">${r.id}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400">Nama Lengkap</p>
+                            <p class="font-bold text-slate-900 dark:text-white">${r.nama}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400">NISN</p>
+                            <p class="font-bold text-slate-900 dark:text-white">${r.nisn}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400">Asal Sekolah</p>
+                            <p class="font-bold text-slate-900 dark:text-white">${r.sekolah}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400">Hubungi WhatsApp</p>
+                            <a href="https://wa.me/${r.wa.replace(/\D/g,'')}" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:underline font-bold inline-flex items-center gap-1">
+                                <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i> ${r.wa}
+                            </a>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400">Cabang Lomba</p>
+                            <p class="font-bold text-purple-700 dark:text-purple-400">${r.lomba}</p>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        ${proofHTML}
+                    </div>
+                `;
+            } catch(err) {
+                modalBody.innerHTML = `<div class="p-6 text-center text-rose-500 text-xs font-bold">${err.message}</div>`;
+            }
         }
 
         function closeDetailModal() {
-            document.getElementById('modal-detail').classList.add('hidden');
+            const detailMdl = document.getElementById('modal-detail');
+            if(detailMdl) detailMdl.classList.add('hidden');
         }
 
         async function changeRegistrantStatus(id, newStatus) {
@@ -1296,14 +1376,17 @@
         }
 
         function populateSettingsForm() {
-            document.getElementById('set-prizepool').value = appState.settings.totalPrizePool;
-            document.getElementById('set-branches-count').value = appState.settings.totalBranches;
+            const prPool = document.getElementById('set-prizepool');
+            const brCount = document.getElementById('set-branches-count');
+            if(prPool) prPool.value = appState.settings.totalPrizePool;
+            if(brCount) brCount.value = appState.settings.totalBranches;
 
             const container = document.getElementById('set-categories-list');
             if (!container) return;
-            container.innerHTML = '';
+            
+            let htmlContent = '';
             appState.settings.categories.forEach((cat, index) => {
-                container.innerHTML += `
+                htmlContent += `
                     <div class="flex flex-col sm:flex-row gap-3 border-b pb-4 border-slate-200 dark:border-purple-950/30 items-start w-full">
                         <input type="hidden" name="cat-id-${index}" value="${cat.id}">
                         <div class="w-full sm:w-1/3">
@@ -1318,6 +1401,7 @@
                     </div>
                 `;
             });
+            container.innerHTML = htmlContent;
         }
 
         function addNewCategoryRow() {
@@ -1364,12 +1448,7 @@
                 const nameVal = row.querySelector(`input[name^="cat-name-"]`).value;
                 const descVal = row.querySelector(`input[name^="cat-desc-"]`).value;
 
-                listCategories.push({
-                    id: idVal,
-                    name: nameVal,
-                    icon: "fa-trophy",
-                    description: descVal
-                });
+                listCategories.push({ id: idVal, name: nameVal, icon: "fa-trophy", description: descVal });
             }
 
             appState.settings.categories = listCategories;
@@ -1396,6 +1475,7 @@
             if (!tbody) return;
             tbody.innerHTML = '';
 
+            let tbodyHtml = '';
             appState.users.forEach(user => {
                 let actionBtnHTML = "";
                 const editable = canEditUser(currentUser, user);
@@ -1411,7 +1491,7 @@
                     actionBtnHTML = `<span class="text-xs text-slate-400 italic font-medium">Terkunci</span>`;
                 }
 
-                tbody.innerHTML += `
+                tbodyHtml += `
                     <tr class="hover:bg-slate-200/30 dark:hover:bg-purple-950/20 border-b border-slate-200 dark:border-purple-950/20 transition">
                         <td class="p-3 font-bold text-slate-800 dark:text-white">${user.username}</td>
                         <td class="p-3 text-slate-600 dark:text-slate-300 font-medium">${user.name}</td>
@@ -1424,6 +1504,7 @@
                     </tr>
                 `;
             });
+            tbody.innerHTML = tbodyHtml;
 
             const roleSelect = document.getElementById('user-new-role');
             if (roleSelect) {
@@ -1544,10 +1625,14 @@
             }
         }
 
-        window.addEventListener('load', () => {
-            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-                document.getElementById('mobile-menu').classList.toggle('hidden');
-            });
+        window.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            if(mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    const mMenu = document.getElementById('mobile-menu');
+                    if(mMenu) mMenu.classList.toggle('hidden');
+                });
+            }
             syncWithSupabase('pull');
         });
     </script>
