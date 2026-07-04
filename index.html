@@ -41,40 +41,40 @@
         .app-view { display: none; }
         .app-view.active { display: block; }
 
-        /* --- 3D GLASSMORPHISM UTILITIES --- */
+        /* --- 3D GLASSMORPHISM UTILITIES (BLUR & SHADOWS SLIMMING DOWN) --- */
         .glass-card {
             background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15),
-                        inset 0 4px 4px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.08),
+                        inset 0 2px 2px 0 rgba(255, 255, 255, 0.2);
         }
         .dark .glass-card {
             background: rgba(27, 21, 54, 0.55);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5),
-                        inset 0 2px 4px 0 rgba(255, 255, 255, 0.05);
+            box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.3),
+                        inset 0 1px 2px 0 rgba(255, 255, 255, 0.05);
         }
 
         /* --- NEUMORPHISM UTILITIES --- */
         .neu-flat {
             background: #e0e5ec;
-            box-shadow: 9px 9px 16px #be99cc, -9px -9px 16px #ffffff;
+            box-shadow: 4px 4px 10px #be99cc, -4px -4px 10px #ffffff;
         }
         .dark .neu-flat {
             background: #1b1536;
-            box-shadow: 8px 8px 18px #090712, -8px -8px 18px #2d235a;
+            box-shadow: 4px 4px 12px #090712, -4px -4px 12px #2d235a;
         }
         .neu-inset {
             background: #e0e5ec;
-            box-shadow: inset 6px 6px 10px #b8b0d0, inset -6px -6px 10px #ffffff;
+            box-shadow: inset 3px 3px 6px #b8b0d0, inset -3px -3px 6px #ffffff;
         }
         .dark .neu-inset {
             background: #15102a;
-            box-shadow: inset 6px 6px 12px #07050d, inset -6px -6px 12px #231b47;
+            box-shadow: inset 3px 3px 6px #07050d, inset -3px -3px 6px #231b47;
         }
     </style>
 </head>
@@ -156,8 +156,8 @@
             <div class="flex items-center justify-between h-20">
                 <!-- Logo & Brand -->
                 <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
-                    <img src="logo-mau.png" alt="Logo MAU" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">
-                    <img src="logo-kompass.png" alt="Logo KOMPASS" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">
+                    <img src="logo-mau.png" alt="Logo MAU" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(255,255,255,0.2)]">
+                    <img src="logo-kompass.png" alt="Logo KOMPASS" class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(255,255,255,0.2)]">
                     <div class="hidden sm:block leading-none ml-1">
                         <span class="font-bold text-sm sm:text-base md:text-lg block tracking-wide text-slate-900 dark:text-purple-300">KOMPASS 2026</span>
                         <span class="text-[10px] sm:text-xs text-primary dark:text-emerald-400 block font-medium">MA Unggulan Darul 'Ulum</span>
@@ -181,7 +181,7 @@
                     </span>
                     <!-- Auth State Button -->
                     <div id="auth-nav-wrapper">
-                        <button onclick="openLoginModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-indigo-500 text-white px-6 py-2.5 rounded-full font-semibold hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] transition duration-300 transform hover:-translate-y-0.5">
+                        <button onclick="openLoginModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-indigo-500 text-white px-6 py-2.5 rounded-full font-semibold hover:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition duration-300 transform hover:-translate-y-0.5">
                             <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
                         </button>
                     </div>
@@ -210,7 +210,7 @@
     <!-- VIEW: HOME -->
     <div id="view-home" class="app-view active flex-grow px-2 sm:px-4">
         <!-- Hero Section -->
-        <header class="relative glass-card text-slate-900 dark:text-white py-20 sm:py-28 my-4 rounded-3xl overflow-hidden text-center max-w-7xl mx-auto shadow-2xl">
+        <header class="relative glass-card text-slate-900 dark:text-white py-20 sm:py-28 my-4 rounded-3xl overflow-hidden text-center max-w-7xl mx-auto shadow-lg">
             <!-- Background Ornamen Abstract untuk Dimensi 3D -->
             <div class="absolute -top-24 -left-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -225,7 +225,7 @@
                     Ajang pembuktian bakat dan kecerdasan siswa tingkat SMP/MTs sederajat dalam menyongsong tantangan zaman berbekal iman, sains, dan kreativitas.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-5 max-w-xs sm:max-w-none mx-auto">
-                    <button onclick="navigateTo('register')" class="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-purple-500/30 transition duration-300 transform hover:-translate-y-1 w-full sm:w-auto">
+                    <button onclick="navigateTo('register')" class="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold shadow-md hover:shadow-purple-500/20 transition duration-300 transform hover:-translate-y-1 w-full sm:w-auto">
                         <i class="fa-solid fa-user-plus mr-2"></i> Daftar Sekarang
                     </button>
                     <a href="#lomba" class="neu-flat border border-slate-300 dark:border-purple-900/50 text-slate-800 dark:text-white px-8 py-4 rounded-2xl font-bold transition duration-300 w-full sm:w-auto flex items-center justify-center transform hover:-translate-y-1">
@@ -239,21 +239,21 @@
         <section class="py-12 max-w-7xl mx-auto px-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                 <div class="p-8 neu-flat rounded-2xl text-center border border-white/40 dark:border-purple-950/30">
-                    <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform -rotate-6">
+                    <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md transform -rotate-6">
                         <i class="fa-solid fa-trophy text-2xl text-white"></i>
                     </div>
-                    <span id="stat-prizes" class="block text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-purple-300">Rp 15.000.000</span>
+                    <span id="stat-prizes" class="block text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-purple-300">...</span>
                     <span class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium block mt-1">Total Hadiah & Beasiswa</span>
                 </div>
                 <div class="p-8 neu-flat rounded-2xl text-center border border-white/40 dark:border-purple-950/30">
-                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform rotate-6">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md transform rotate-6">
                         <i class="fa-solid fa-cubes text-2xl text-white"></i>
                     </div>
-                    <span id="stat-branches" class="block text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-purple-300">4</span>
+                    <span id="stat-branches" class="block text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-purple-300">0</span>
                     <span class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium block mt-1">Cabang Perlombaan</span>
                 </div>
                 <div class="p-8 neu-flat rounded-2xl text-center border border-white/40 dark:border-purple-950/30 sm:col-span-2 md:col-span-1">
-                    <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform -rotate-3">
+                    <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md transform -rotate-3">
                         <i class="fa-solid fa-user-graduate text-2xl text-white"></i>
                     </div>
                     <span id="stat-registrants" class="block text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-purple-300">0</span>
@@ -275,9 +275,9 @@
                         Setiap pemenang berhak mendapatkan piala penghargaan tetap, piagam resmi, dana pembinaan jutaan rupiah, serta peluang emas berupa jalur beasiswa khusus masuk ke MA Unggulan Darul 'Ulum Jombang.
                     </p>
                 </div>
-                <div class="glass-card p-8 sm:p-12 rounded-3xl text-center border border-white dark:border-purple-900/30 shadow-xl relative overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
+                <div class="glass-card p-8 sm:p-12 rounded-3xl text-center border border-white dark:border-purple-900/30 shadow-md relative overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
                     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-600/10 rounded-full blur-2xl"></div>
-                    <i class="fa-solid fa-medal text-yellow-500 dark:text-yellow-400 text-7xl sm:text-8xl mb-4 filter drop-shadow-[0_4px_10px_rgba(218,165,32,0.4)] animate-bounce"></i>
+                    <i class="fa-solid fa-medal text-yellow-500 dark:text-yellow-400 text-7xl sm:text-8xl mb-4 filter drop-shadow-[0_2px_4px_rgba(218,165,32,0.3)] animate-bounce"></i>
                     <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Piala Bergilir & Penghargaan</h3>
                     <p class="text-xs sm:text-sm text-slate-500 dark:text-purple-300 leading-relaxed">Rebut tempat terbaik dan jadilah saksi lahirnya generasi unggul berikutnya di MA Unggulan Darul 'Ulum!</p>
                 </div>
@@ -298,14 +298,14 @@
 
     <!-- VIEW: REGISTER -->
     <div id="view-register" class="app-view flex-grow py-12 px-4 max-w-4xl mx-auto w-full">
-        <div class="glass-card rounded-3xl overflow-hidden border border-white dark:border-purple-900/30 shadow-2xl">
+        <div class="glass-card rounded-3xl overflow-hidden border border-white dark:border-purple-900/30 shadow-lg">
             <div class="bg-gradient-to-r from-purple-700 to-indigo-800 p-8 text-center text-white">
                 <h2 class="text-2xl sm:text-3xl font-bold">Formulir Pendaftaran KOMPASS 2026</h2>
                 <p class="text-purple-200 text-xs sm:text-sm mt-2">Isi data calon peserta lomba dengan lengkap dan teliti.</p>
             </div>
 
             <div class="flex items-center justify-center gap-3 bg-slate-200/50 dark:bg-darkBg/60 py-4 px-4 text-xs sm:text-sm font-semibold text-center border-b border-slate-300 dark:border-purple-950/40">
-                <span id="step-badge-1" class="px-4 py-2 rounded-full shadow-md transition-all">1. Data Peserta</span>
+                <span id="step-badge-1" class="px-4 py-2 rounded-full shadow-sm transition-all">1. Data Peserta</span>
                 <span class="text-slate-400 font-bold">&gt;</span>
                 <span id="step-badge-2" class="px-4 py-2 rounded-full transition-all">2. Pembayaran & Bukti</span>
             </div>
@@ -351,7 +351,7 @@
                         </div>
                     </div>
                     <div class="text-right pt-4">
-                        <button type="button" onclick="goToStep(2)" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-purple-500/20 transition duration-300 text-sm w-full sm:w-auto">
+                        <button type="button" onclick="goToStep(2)" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold shadow-md hover:shadow-purple-500/10 transition duration-300 text-sm w-full sm:w-auto">
                             Lanjut ke Pembayaran <i class="fa-solid fa-arrow-right ml-1"></i>
                         </button>
                     </div>
@@ -383,7 +383,7 @@
                         <button type="button" onclick="goToStep(1)" class="neu-flat border border-slate-300 dark:border-purple-900/40 text-slate-700 dark:text-slate-300 px-6 py-3.5 rounded-xl font-bold transition duration-300 text-sm w-full sm:w-auto">
                             <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
                         </button>
-                        <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-purple-500/20 transition duration-300 shadow-md text-sm w-full sm:w-auto">
+                        <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-purple-500/10 transition duration-300 shadow-md text-sm w-full sm:w-auto">
                             Kirim & Selesaikan Pendaftaran
                         </button>
                     </div>
@@ -391,7 +391,7 @@
             </form>
 
             <div id="registration-success" class="hidden p-8 sm:p-12 text-center space-y-5">
-                <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-950 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-950 rounded-full flex items-center justify-center mx-auto shadow-sm">
                     <i class="fa-solid fa-circle-check text-5xl text-emerald-600 dark:text-emerald-400 animate-bounce"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-slate-900 dark:text-purple-300">Pendaftaran Terkirim!</h3>
@@ -416,7 +416,7 @@
         </div>
 
         <!-- News Publisher Form -->
-        <div id="news-publisher-box" class="hidden glass-card p-6 sm:p-8 rounded-3xl mb-12 max-w-2xl border border-white dark:border-purple-900/30 shadow-xl">
+        <div id="news-publisher-box" class="hidden glass-card p-6 sm:p-8 rounded-3xl mb-12 max-w-2xl border border-white dark:border-purple-900/30 shadow-md">
             <h3 class="font-bold text-lg mb-4 text-slate-900 dark:text-white">Tulis Berita Baru</h3>
             <form id="news-form" class="space-y-4">
                 <div>
@@ -443,12 +443,12 @@
     <div id="view-dashboard" class="app-view flex-grow py-8 px-4 max-w-7xl mx-auto w-full">
         <div class="space-y-8">
             <!-- Header Dashboard -->
-            <div class="glass-card p-6 rounded-3xl border border-white dark:border-purple-900/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xl">
+            <div class="glass-card p-6 rounded-3xl border border-white dark:border-purple-900/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-md">
                 <div>
                     <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Dashboard Manajemen</h2>
                     <p class="text-xs text-slate-500 dark:text-purple-300 mt-1">Selamat datang, <span id="dash-user-name" class="font-bold text-purple-600 dark:text-purple-400">Nama Akun</span> (<span id="dash-user-role" class="italic">Role</span>)</p>
                 </div>
-                <button onclick="handleLogout()" class="bg-gradient-to-r from-rose-500 to-red-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:shadow-red-500/20 transition duration-300 text-xs sm:text-sm w-full sm:w-auto">
+                <button onclick="handleLogout()" class="bg-gradient-to-r from-rose-500 to-red-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:shadow-red-500/10 transition duration-300 text-xs sm:text-sm w-full sm:w-auto">
                     <i class="fa-solid fa-power-off mr-1.5"></i> Logout
                 </button>
             </div>
@@ -461,7 +461,7 @@
             </div>
 
             <!-- TAB CONTENT: DATA PENDAFTAR -->
-            <div id="tab-registrants" class="dash-tab glass-card rounded-3xl p-6 border border-white dark:border-purple-900/30 shadow-xl overflow-hidden">
+            <div id="tab-registrants" class="dash-tab glass-card rounded-3xl p-6 border border-white dark:border-purple-900/30 shadow-md overflow-hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Daftar Berkas Calon Peserta</h3>
                     <select id="filter-status" onchange="renderDashboardRegistrants()" class="w-full sm:w-auto px-4 py-2.5 border-0 bg-slate-100 dark:bg-darkBg text-slate-900 dark:text-white neu-inset rounded-xl text-xs sm:text-sm outline-none focus:ring-2 focus:ring-purple-500 transition">
@@ -482,7 +482,7 @@
                                 <th class="p-4">Asal Sekolah</th>
                                 <th class="p-4">Lomba</th>
                                 <th class="p-4">Status</th>
-                                <th class="p-4 text-center">Aksi</th>
+                                <th class="p-4 text-center">Aki</th>
                             </tr>
                         </thead>
                         <tbody id="dash-registrants-tbody" class="divide-y divide-slate-200 dark:divide-purple-950/30 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
@@ -493,7 +493,7 @@
             </div>
 
             <!-- TAB CONTENT: PENGATURAN LOMBA -->
-            <div id="tab-settings" class="dash-tab hidden glass-card rounded-3xl p-6 sm:p-8 border border-white dark:border-purple-900/30 shadow-xl max-w-3xl">
+            <div id="tab-settings" class="dash-tab hidden glass-card rounded-3xl p-6 sm:p-8 border border-white dark:border-purple-900/30 shadow-md max-w-3xl">
                 <h3 class="font-extrabold text-lg text-slate-900 dark:text-white mb-6">Manajemen Event & Kategori Lomba</h3>
                 <form id="settings-form" class="space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -502,8 +502,8 @@
                             <input type="text" id="set-prizepool" required class="w-full px-4 py-2.5 border-0 bg-slate-100 dark:bg-darkBg text-slate-900 dark:text-white neu-inset rounded-xl text-xs sm:text-sm outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-purple-300 mb-2">Jumlah Cabang Lomba</label>
-                            <input type="number" id="set-branches-count" required class="w-full px-4 py-2.5 border-0 bg-slate-100 dark:bg-darkBg text-slate-900 dark:text-white neu-inset rounded-xl text-xs sm:text-sm outline-none">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-purple-300 mb-2">Offset Pendaftar (Tambahan Tampilan)</label>
+                            <input type="number" id="set-registrants-offset" required min="0" class="w-full px-4 py-2.5 border-0 bg-slate-100 dark:bg-darkBg text-slate-900 dark:text-white neu-inset rounded-xl text-xs sm:text-sm outline-none">
                         </div>
                     </div>
                     <div>
@@ -524,7 +524,7 @@
             </div>
 
             <!-- TAB CONTENT: MANAJEMEN AKUN -->
-            <div id="tab-usermgt" class="dash-tab hidden glass-card rounded-3xl p-6 border border-white dark:border-purple-900/30 shadow-xl">
+            <div id="tab-usermgt" class="dash-tab hidden glass-card rounded-3xl p-6 border border-white dark:border-purple-900/30 shadow-md">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Form Tambah / Edit User -->
                     <div id="usermgt-form-wrapper" class="bg-slate-100/60 dark:bg-darkBg/50 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-purple-950/40 h-fit shadow-inner">
@@ -631,7 +631,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="glass-card text-slate-600 dark:text-slate-400 pt-16 pb-8 border-t border-white dark:border-purple-900/20 mt-auto rounded-t-3xl mx-2 shadow-2xl">
+    <footer class="glass-card text-slate-600 dark:text-slate-400 pt-16 pb-8 border-t border-white dark:border-purple-900/20 mt-auto rounded-t-3xl mx-2 shadow-md">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
                 <!-- Madrasah Info -->
@@ -682,7 +682,7 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT SYSTEM ENGINE (TERJAGA 100% UTAL-ATIL FREE) -->
+    <!-- JAVASCRIPT SYSTEM ENGINE -->
     <script>
         // FUNCTION FOR LIGHT/DARK MODE SWITCH CONTROL WITH CONTRAST RENDER
         function toggleTheme() {
@@ -731,6 +731,7 @@
             settings: {
                 totalPrizePool: "Rp 15.000.000",
                 totalBranches: 4,
+                registrantsOffset: 0,
                 categories: [
                     { id: "MQK", name: "Musabaqah Qiraatul Kutub (MQK)", icon: "fa-book-open-reader", description: "Membaca kitab kuning / kitab salaf bertema aqidah dan syariah." },
                     { id: "CCI", name: "Cerdas Cermat Islam (CCI)", icon: "fa-brain", description: "Uji kecerdasan pengetahuan agama secara beregu/individu." },
@@ -747,7 +748,7 @@
             ]
         };
 
-        let appState = JSON.parse(localStorage.getItem('KOMPASS_LOCAL_STATE')) || DEFAULT_STATE;
+        let appState = DEFAULT_STATE;
         let currentUser = JSON.parse(sessionStorage.getItem('KOMPASS_SESSION')) || null;
         let uploadedFileBase64 = "";
         let editingUserTarget = null;
@@ -798,6 +799,7 @@
                         id: 'default',
                         total_prize_pool: appState.settings.totalPrizePool,
                         total_branches: appState.settings.totalBranches,
+                        registrants_offset: appState.settings.registrantsOffset,
                         categories: appState.settings.categories
                     });
                 } else {
@@ -805,7 +807,8 @@
                     if (!sErr && settingsData) {
                         appState.settings = {
                             totalPrizePool: settingsData.total_prize_pool,
-                            totalBranches: settingsData.total_branches,
+                            totalBranches: settingsData.total_branches || settingsData.categories.length,
+                            registrantsOffset: settingsData.registrants_offset || 0,
                             categories: settingsData.categories
                         };
                     } else if (sErr && sErr.code === 'PGRST116') {
@@ -813,6 +816,7 @@
                             id: 'default',
                             total_prize_pool: DEFAULT_STATE.settings.totalPrizePool,
                             total_branches: DEFAULT_STATE.settings.totalBranches,
+                            registrants_offset: DEFAULT_STATE.settings.registrantsOffset,
                             categories: DEFAULT_STATE.settings.categories
                         });
                     }
@@ -836,7 +840,6 @@
                     }
                 }
                 
-                localStorage.setItem('KOMPASS_LOCAL_STATE', JSON.stringify(appState));
                 updateSyncStatus('connected');
             } catch (err) {
                 console.error("Supabase Database error: ", err);
@@ -848,17 +851,18 @@
 
         function renderPublicInterface() {
             document.getElementById('stat-prizes').innerText = appState.settings.totalPrizePool;
-            document.getElementById('stat-branches').innerText = appState.settings.totalBranches;
+            document.getElementById('stat-branches').innerText = appState.settings.categories.length;
             
             const approvedCount = appState.registrants.filter(r => r.status === 'Disetujui').length;
-            document.getElementById('stat-registrants').innerText = approvedCount;
+            const offset = parseInt(appState.settings.registrantsOffset) || 0;
+            document.getElementById('stat-registrants').innerText = approvedCount + offset;
 
             const container = document.getElementById('categories-container');
             if (container) {
                 container.innerHTML = '';
                 appState.settings.categories.forEach(cat => {
                     container.innerHTML += `
-                        <div class="glass-card rounded-2xl border border-white dark:border-purple-900/30 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="glass-card rounded-2xl border border-white dark:border-purple-900/30 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
                             <div class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white p-6 text-center relative">
                                 <div class="absolute inset-0 bg-black/10"></div>
                                 <i class="fa-solid ${cat.icon || 'fa-trophy'} text-4xl text-yellow-400 mb-3 relative z-10 filter drop-shadow-sm"></i>
@@ -903,7 +907,7 @@
             } else {
                 appState.news.forEach(item => {
                     container.innerHTML += `
-                        <div class="glass-card border border-white dark:border-purple-900/30 rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition duration-300">
+                        <div class="glass-card border border-white dark:border-purple-900/30 rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-md transition duration-300">
                             <span class="text-xs font-bold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 px-3 py-1.5 rounded-full mb-4 inline-block shadow-sm">${item.date}</span>
                             <h3 class="font-extrabold text-xl text-slate-900 dark:text-white mb-3">${item.title}</h3>
                             <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 whitespace-pre-line">${item.content}</p>
@@ -1297,7 +1301,7 @@
 
         function populateSettingsForm() {
             document.getElementById('set-prizepool').value = appState.settings.totalPrizePool;
-            document.getElementById('set-branches-count').value = appState.settings.totalBranches;
+            document.getElementById('set-registrants-offset').value = appState.settings.registrantsOffset || 0;
 
             const container = document.getElementById('set-categories-list');
             if (!container) return;
@@ -1352,7 +1356,7 @@
             e.preventDefault();
 
             appState.settings.totalPrizePool = document.getElementById('set-prizepool').value;
-            appState.settings.totalBranches = parseInt(document.getElementById('set-branches-count').value);
+            appState.settings.registrantsOffset = parseInt(document.getElementById('set-registrants-offset').value) || 0;
 
             const categoriesContainer = document.getElementById('set-categories-list');
             const listCategories = [];
@@ -1373,10 +1377,11 @@
             }
 
             appState.settings.categories = listCategories;
+            appState.settings.totalBranches = listCategories.length; // Otomatis disinkronkan dengan jumlah list kategori yang ada
             
             try {
                 await syncWithSupabase('push_settings');
-                alert("Pengaturan website dan cabang lomba berhasil disimpan!");
+                alert("Pengaturan website dan cabang lomba berhasil disimpan ke database!");
                 navigateTo('dashboard');
             } catch (err) {
                 alert("Gagal sinkronisasi data: " + err.message);
